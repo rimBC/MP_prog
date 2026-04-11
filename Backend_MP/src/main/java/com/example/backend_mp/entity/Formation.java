@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Formation entity representing training sessions
@@ -64,15 +65,25 @@ public class Formation {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-        name = "participant_formation",
-        joinColumns = @JoinColumn(name = "id_formation"),
-        inverseJoinColumns = @JoinColumn(name = "id_participant")
-    )
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    @JoinTable(
+//        name = "participant_formation",
+//        joinColumns = @JoinColumn(name = "id_formation"),
+//        inverseJoinColumns = @JoinColumn(name = "id_participant")
+//    )
+//    @Builder.Default
+//    private Set<Participant> participants = new HashSet<>();
+
+    @OneToMany(mappedBy = "formation", cascade = CascadeType.ALL)
     @Builder.Default
-    private Set<Participant> participants = new HashSet<>();
-    
+    private Set<ParticipantFormation> participantFormations = new HashSet<>();
+
+    public Set<Participant> getParticipants() {
+        return participantFormations.stream()
+                .map(ParticipantFormation::getParticipant)
+                .collect(Collectors.toSet());
+    }
+
     @PrePersist
     protected void onCreate() {
         dateCreation = new Date();

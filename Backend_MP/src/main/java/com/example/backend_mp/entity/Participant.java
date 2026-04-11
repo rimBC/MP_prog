@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Participant entity representing training participants
@@ -50,4 +53,15 @@ public class Participant {
     
     @Column(name = "actif", nullable = false)
     private Boolean actif = true;
+
+    @OneToMany(mappedBy = "participant")
+    @Builder.Default
+    private Set<ParticipantFormation> participantFormations = new HashSet<>();
+
+    public Set<Formation> getFormations() {
+        return participantFormations.stream()
+                .map(ParticipantFormation::getFormation)
+                .collect(Collectors.toSet());
+    }
+
 }
