@@ -32,17 +32,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String requestPath = request.getRequestURI();
-
+            String requestPath = request.getServletPath();
             // Skip filter for public endpoints
-            if (requestPath.startsWith("/api/auth/") ||
+            if (requestPath.startsWith("/api/auth/login") ||
                     requestPath.startsWith("/swagger-ui") ||
-                    requestPath.startsWith("/api/api/auth/") ||
+                    requestPath.startsWith("/auth/login") ||
                     requestPath.startsWith("/api/swagger-ui") ||
                     requestPath.startsWith("/v3/api-docs")) {
                 filterChain.doFilter(request, response);
                 return;
             }
+            if (true) return;
             String jwt = getJwtFromRequest(request);
             
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {

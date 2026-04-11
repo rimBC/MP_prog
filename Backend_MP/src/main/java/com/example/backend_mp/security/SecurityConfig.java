@@ -86,13 +86,13 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
-                    .requestMatchers("/api/api/auth/**").permitAll()
+                    .requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/error").permitAll() // Add this
 
                     .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/swagger-ui/**","/swagger-ui/**", "/v3/api-docs/**", "/api/swagger-ui.html").permitAll()
-                
+
                 // Formateur endpoints
                 .requestMatchers(HttpMethod.GET, "/api/formateurs/**").hasAnyRole("SIMPLE_UTILISATEUR", "RESPONSABLE", "ADMINISTRATEUR")
                 .requestMatchers(HttpMethod.POST, "/api/formateurs").hasAnyRole("SIMPLE_UTILISATEUR", "ADMINISTRATEUR")
