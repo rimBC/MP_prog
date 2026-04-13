@@ -1,0 +1,125 @@
+<div class="min-h-screen bg-linear-to-br from-blue-500 to-slate-600 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+
+        <!-- Login Card -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between  py-2 mb-8 bg-white">
+
+                <!-- Center Title -->
+                <div class="text-left">
+                    <h1 class="text-3xl font-bold mb-2 shimer">Excellent Training</h1>
+                    <p class="text-blue-900">Sign in to your account</p>
+                </div>
+                <img src="Utm.png" alt="Right Logo" class="h-15 w-auto object-contain" />
+
+            </div>
+
+            <!-- Error Message -->
+            @if (error) {
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                <p class="font-medium">{{ error }}</p>
+            </div>
+            }
+
+            <!-- Login Form -->
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                <!-- Login Input -->
+                <div class="mb-4">
+                    <label for="login" class="block text-gray-700 font-medium mb-2">Login</label>
+
+                    <input type="text" id="login" formControlName="login"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        placeholder="Enter your username" [class.border-red-500]="submitted && f['login'].errors" />
+
+                    @if (submitted && f['login'].errors) {
+                    <div class="text-red-500 text-sm mt-1">
+
+                        @if (f['login'].errors['required']) {
+                        <span>Username is required</span>
+                        }
+
+                        @if (f['login'].errors['minlength']) {
+                        <span>Username must be at least 3 characters</span>
+                        }
+
+                    </div>
+                    }
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+
+                    <input type="password" id="password" formControlName="password"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        placeholder="Enter your password" [class.border-red-500]="submitted && f['password'].errors" />
+
+                    @if (submitted && f['password'].errors) {
+                    <div class="text-red-500 text-sm mt-1">
+
+                        @if (f['password'].errors['required']) {
+                        <span>Password is required</span>
+                        }
+
+                        @if (f['password'].errors['minlength']) {
+                        <span>Password must be at least 8 characters</span>
+                        }
+
+                    </div>
+                    }
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" [disabled]="loading"
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    @if (!loading) {
+                    <span>Sign In</span>
+                    } @else {
+                    <span class="flex items-center justify-center">
+                        <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                                fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Signing in...
+                    </span>
+                    }
+                </button>
+
+            </form>
+
+            <!-- Demo Credentials -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-gray-600 text-sm text-center mb-3">Demo Credentials:</p>
+
+                <div class="space-y-2 text-sm">
+
+                    <div class="bg-gray-100 p-2 rounded">
+                        <p class="text-gray-700"><strong>Admin:</strong> ADMINISTRATEUR / admin123</p>
+                    </div>
+
+                    <div class="bg-gray-100 p-2 rounded">
+                        <p class="text-gray-700"><strong>User:</strong> SIMPLE_UTILISATEUR / password123</p>
+                    </div>
+
+                    <div class="bg-gray-100 p-2 rounded">
+                        <p class="text-gray-700"><strong>Manager:</strong> RESPONSABLE / password123</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-6 text-white">
+            <p class="text-sm">© 2026 ISI. All rights reserved.</p>
+        </div>
+
+    </div>
+</div>

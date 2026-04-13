@@ -1,0 +1,27 @@
+@if (isOpen) {
+<div class="absolute inset-0 bg-gray-800/75 z-50 flex justify-center items-baseline
+           animate-fade-in" (click)="closeOutside($event)">
+
+    <div class="fixed bg-gray-800 text-gray-100 p-8 rounded-lg shadow-lg min-w-80 lg:min-w-96 max-w-96 pb-14
+             animate-scale-in top-[40vh]">
+        <h2 [ngClass]="title === 'success' ? 'text-green-700' : 'text-red-50'"
+            class="text-xl first-letter:uppercase font-bold tracking-wider w-full mb-3">
+            {{ title }}
+        </h2>
+
+        <p class="first-letter:uppercase whitespace-pre-wrap mb-3">
+            {{ message }}
+        </p>
+
+        <button class="absolute px-4 py-2 rounded-sm tracking-wider shadow-md text-xs lg:text-sm
+               hover:bg-red-600 text-slate-100 bg-red-800 hover:text-white bottom-5 right-5" (click)="closeModal()">
+            Close
+        </button>
+
+        <button class="absolute top-5 right-5 rounded-full border border-white p-0 size-5 text-xs
+               opacity-40 hover:opacity-100" (click)="closeModal()">
+            x
+        </button>
+    </div>
+</div>
+}

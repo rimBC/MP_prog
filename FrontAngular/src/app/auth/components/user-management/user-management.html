@@ -1,0 +1,185 @@
+<div class="max-w-2xl mx-auto p-6">
+
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">User Management</h1>
+        <p class="text-gray-600">Create and manage user accounts</p>
+    </div>
+
+    <!-- Success Message -->
+    @if (success) {
+    <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <p class="font-medium">✓ {{ success }}</p>
+    </div>
+    }
+
+    <!-- Error Message -->
+    @if (error) {
+    <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <p class="font-medium">✗ {{ error }}</p>
+    </div>
+    }
+
+    <!-- Create User Form -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Create New User</h2>
+
+        <form [formGroup]="createUserForm" (ngSubmit)="onSubmit()">
+
+            <!-- Login Field -->
+            <div class="mb-6">
+                <label for="login" class="block text-gray-700 font-medium mb-2">Username</label>
+
+                <div class="relative">
+                    <input type="text" id="login" formControlName="login" (blur)="checkLoginAvailability()"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        placeholder="Enter username (min 3 characters)"
+                        [class.border-red-500]="submitted && f['login'].errors || (!loginAvailable && !checkingAvailability)"
+                        [class.border-green-500]="submitted && !f['login'].errors && loginAvailable" />
+
+                    @if (checkingAvailability) {
+                    <div class="absolute right-4 top-3">
+                        <svg class="animate-spin h-5 w-5 text-gray-400" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                                fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                    </div>
+                    }
+
+                    @if (!checkingAvailability && loginAvailable && f['login'].value) {
+                    <div class="absolute right-4 top-3 text-green-500">
+                        ✓
+                    </div>
+                    }
+                </div>
+
+                @if (submitted && f['login'].errors) {
+                <div class="text-red-500 text-sm mt-1">
+                    @if (f['login'].errors['required']) {
+                    <span>Username is required</span>
+                    }
+                    @if (f['login'].errors['minlength']) {
+                    <span>Username must be at least 3 characters</span>
+                    }
+                </div>
+                }
+
+                @if (!loginAvailable) {
+                <div class="text-red-500 text-sm mt-1">
+                    This username is already taken
+                </div>
+                }
+            </div>
+
+            <!-- Role Selection -->
+            <div class="mb-6">
+                <label for="roleId" class="block text-gray-700 font-medium mb-2">User Role</label>
+
+                <select id="roleId" formControlName="roleId" (change)="getRoleDescription(f['roleId'].value)"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    [class.border-red-500]="submitted && f['roleId'].errors">
+                    <option value="">Select a role</option>
+                    <option *ngFor="let role of roles" [value]="role.id">
+                        {{ role.name }}
+                    </option>
+                </select>
+
+                @if (f['roleId'].value) {
+                <p class="text-gray-600 text-sm mt-2">
+                    {{ getRoleDescription(f['roleId'].value) }}
+                </p>
+                }
+
+                @if (submitted && f['roleId'].errors) {
+                <div class="text-red-500 text-sm mt-1">
+                    @if (f['roleId'].errors['required']) {
+                    <span>Role is required</span>
+                    }
+                </div>
+                }
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+
+                <div class="relative">
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+                        class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        placeholder="Enter password (min 8 characters)"
+                        [class.border-red-500]="submitted && f['password'].errors" />
+
+                    <button type="button" (click)="showPassword = !showPassword"
+                        class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+
+                        @if (!showPassword) {
+                        <span>👁️</span>
+                        } @else {
+                        <span>👁️‍🗨️</span>
+                        }
+
+                    </button>
+                </div>
+
+                @if (submitted && f['password'].errors) {
+                <div class="text-red-500 text-sm mt-1">
+                    @if (f['password'].errors['required']) {
+                    <span>Password is required</span>
+                    }
+                    @if (f['password'].errors['minlength']) {
+                    <span>Password must be at least 8 characters</span>
+                    }
+                </div>
+                }
+            </div>
+
+            <!-- Password Confirmation -->
+            <div class="mb-6">
+                <label for="passwordConfirm" class="block text-gray-700 font-medium mb-2">Confirm Password</label>
+
+                <input [type]="showPassword ? 'text' : 'password'" id="passwordConfirm"
+                    formControlName="passwordConfirm"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    placeholder="Confirm password"
+                    [class.border-red-500]="submitted && (f['passwordConfirm'].errors || createUserForm.errors)" />
+
+                @if (submitted && f['passwordConfirm'].errors) {
+                <div class="text-red-500 text-sm mt-1">
+                    @if (f['passwordConfirm'].errors['required']) {
+                    <span>Password confirmation is required</span>
+                    }
+                </div>
+                }
+
+                @if (submitted && createUserForm.errors && createUserForm.errors['passwordMismatch']) {
+                <div class="text-red-500 text-sm mt-1">
+                    Passwords do not match
+                </div>
+                }
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" [disabled]="loading || !loginAvailable"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                @if (!loading) {
+                <span>Create User</span>
+                } @else {
+                <span class="flex items-center justify-center">
+                    <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                            fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    Creating user...
+                </span>
+                }
+            </button>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+.shimer {
+    background: linear-gradient(to right,
+            var(--color-primary-500) 20%,
+            var(--color-primary-600) 30%,
+            var(--color-primary-600) 70%,
+            var(--color-primary-500) 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 500% auto;
+    animation: textShine 8s ease-in-out infinite reverse;
+}
+
+@keyframes textShine {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
