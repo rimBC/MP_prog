@@ -13,7 +13,12 @@ import { Testing } from './components/testing/testing';
 
 import { Unauthorized } from './auth/components/unauthorized/unauthorized';
 import { Contact } from './shared/components/contact/contact';
-import { Configurations } from './components/configurations/configurations';
+import { Configurations } from './components/admin/configurations/configurations';
+import { ManageUsers } from './components/admin/manage-users/manage-users';
+import { ManageFormation } from './components/user/manage-formation/manage-formation';
+import { Profile } from './shared/components/profile/profile';
+import { ManageFormateur } from './components/user/manage-formateur/manage-formateur';
+import { ManageParticipants } from './components/user/manage-participants/manage-participants';
 
 // Dashboard Components (will be created)
 // import { DashboardComponent } from './features/dashboard/dashboard.component';
@@ -45,10 +50,10 @@ export const routes: Routes = [
       {
         path: 'user',
         children: [
-          { path: 'dashboard', component: Testing }, // Replace with actual dashboard
-          { path: 'trainers', component: Login }, // Replace with actual component
-          { path: 'trainings', component: Login }, // Replace with actual component
-          { path: 'participants', component: Login } // Replace with actual component
+          { path: 'dashboard', component: Profile }, // Replace with actual dashboard
+          { path: 'trainers', component: ManageFormateur }, // Replace with actual component
+          { path: 'trainings', component: ManageFormation }, // Replace with actual component
+          { path: 'participants', component: ManageParticipants } // Replace with actual component
         ],
         canActivate: [RoleGuard],
         data: { roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR'] }
@@ -58,7 +63,7 @@ export const routes: Routes = [
       {
         path: 'manager',
         children: [
-          { path: 'dashboard', component: Testing }, // Replace with actual dashboard
+          { path: 'dashboard', component: Profile }, // Replace with actual dashboard
           { path: 'statistics', component: Testing }, // Replace with actual component
           { path: 'reports', component: Testing }, // Replace with actual component
         ],
@@ -70,8 +75,8 @@ export const routes: Routes = [
       {
         path: 'admin',
         children: [
-          { path: 'dashboard', component: Testing }, // Replace with actual dashboard
-          { path: 'users', component: UserManagement },
+          { path: 'dashboard', component: Profile }, // Replace with actual dashboard
+          { path: 'users', component: ManageUsers },
           { path: 'domains', component: Testing }, // Replace with actual component
           { path: 'structures', component: Testing }, // Replace with actual component
           { path: 'profiles', component: Testing }, // Replace with actual component

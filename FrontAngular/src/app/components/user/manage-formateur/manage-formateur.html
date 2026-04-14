@@ -1,0 +1,225 @@
+<div class="max-w-7xl mx-auto p-6 bg-base text-primary">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold text-primary mb-2">Trainer Management</h1>
+            <p class="text-sec">Manage training instructors (internal and external)</p>
+        </div>
+        <div class="flex gap-4 items-center">
+            <label class="flex items-center gap-2 cursor-pointer p-2 bg-sec rounded">
+                <input type="checkbox" [checked]="usingTestData" (change)="toggleTestDataMode()" class="rounded" />
+                <span class="text-sec text-sm">Test Data</span>
+            </label>
+            <button (click)="toggleForm()" class="px-6 py-2 btn-primary font-medium rounded-lg transition">
+                {{ showForm ? '✕ Cancel' : '✚ Add Trainer' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (success) {
+    <div class="mb-6 p-4 bg-sec border border-base text-primary rounded-lg">
+        <p class="font-medium">✓ {{ success }}</p>
+    </div>
+    }
+    @if (error) {
+    <div class="mb-6 p-4 bg-sec border border-base text-primary rounded-lg">
+        <p class="font-medium">✗ {{ error }}</p>
+    </div>
+    }
+
+    <!-- Add/Edit Form -->
+    @if (showForm) {
+    <div class="bg-sec rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-primary mb-6">{{ editingId ? 'Edit Trainer' : 'Add New Trainer' }}</h2>
+
+        <form [formGroup]="formateurForm" (ngSubmit)="submitForm()" class="space-y-6">
+            <!-- Row 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">First Name</label>
+                    <input type="text" formControlName="prenom"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                        placeholder="First name" [class.border-red-500]="submitted && f['prenom'].errors" />
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Last Name</label>
+                    <input type="text" formControlName="nom"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                        placeholder="Last name" [class.border-red-500]="submitted && f['nom'].errors" />
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">Email</label>
+                    <input type="email" formControlName="email"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                        placeholder="email@company.com" [class.border-red-500]="submitted && f['email'].errors" />
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Phone</label>
+                    <input type="tel" formControlName="tel"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                        placeholder="216 9X XXX XXX" [class.border-red-500]="submitted && f['tel'].errors" />
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">Type</label>
+                    <select formControlName="type"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none">
+                        <option value="interne">Internal</option>
+                        <option value="externe">External</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Employer (for external)</label>
+                    <select formControlName="employeurId"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none">
+                        <option value="">Select employer</option>
+                        @for (employeur of employeurs; track employeur) {
+                        <option [value]="employeur.id">
+                            {{ employeur.nomemployeur }}
+                        </option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Speciality -->
+            <div>
+                <label class="block text-sec font-medium mb-2">Specialty</label>
+                <input type="text" formControlName="specialite"
+                    class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                    placeholder="e.g., Angular & TypeScript"
+                    [class.border-red-500]="submitted && f['specialite'].errors" />
+            </div>
+
+            <!-- Bio -->
+            <div>
+                <label class="block text-sec font-medium mb-2">Biography</label>
+                <textarea formControlName="bio"
+                    class="w-full px-4 py-2 bg-base border border-base rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                    rows="3">
+        </textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4">
+                <button type="submit" [disabled]="loading"
+                    class="flex-1 btn-primary py-2 rounded-lg transition disabled:opacity-50">
+                    {{ editingId ? 'Update Trainer' : 'Create Trainer' }}
+                </button>
+
+                <button type="button" (click)="resetForm()"
+                    class="flex-1 bg-sec border border-base text-primary py-2 rounded-lg transition">
+                    Clear
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+
+    <!-- Filters Section -->
+    <div class="bg-sec rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-primary mb-4">Filters</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sec font-medium mb-2">Search</label>
+                <input [value]="searchText"
+                    class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none" />
+            </div>
+
+            <div>
+                <label class="block text-sec font-medium mb-2">Type</label>
+                <select [value]="filterType"
+                    class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none">
+                    <option value="ALL">All Types</option>
+                    <option value="interne">Internal</option>
+                    <option value="externe">External</option>
+                </select>
+            </div>
+
+            <div></div>
+
+            <div class="flex items-end">
+                <button (click)="resetFilters()" class="w-full btn-primary py-2 rounded-lg transition">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <p class="text-sec text-sm mt-4">
+            Showing {{ getFilteredFormateurs().length }} of {{ formateurs.length }} trainers
+        </p>
+    </div>
+
+    <!-- Trainers Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        @if (getFilteredFormateurs().length === 0) {
+        <div class="col-span-full bg-sec rounded-lg shadow-lg p-8 text-center">
+            <p class="text-sec text-lg mb-2">No trainers found</p>
+            <p class="text-sec">Try adjusting your filters or add a new trainer</p>
+        </div>
+        }
+
+        @for (formateur of getFilteredFormateurs(); track formateur) {
+        <div class="bg-sec rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+
+            <!-- Card Header -->
+            <div class="bg-base-contrast h-24"></div>
+
+            <!-- Card Content -->
+            <div class="p-6 -mt-12 relative">
+                <div
+                    class="w-20 h-20 rounded-full bg-base flex items-center justify-center text-3xl font-bold text-primary mb-4">
+                    {{ formateur.prenom.charAt(0) }}{{ formateur.nom.charAt(0) }}
+                </div>
+
+                <h3 class="text-xl font-bold text-primary">
+                    {{ formateur.prenom }} {{ formateur.nom }}
+                </h3>
+
+                <div class="flex gap-2 mt-2 mb-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-base text-primary">
+                        {{ formateur.type === 'interne' ? 'Internal' : 'External' }}
+                    </span>
+                    <span class="px-3 py-1 bg-base-contrast text-white rounded-full text-xs font-semibold">
+                        📚 {{ formateur.formationsCount }} formations
+                    </span>
+                </div>
+
+                <div class="space-y-2 text-sm mb-4 text-sec">
+                    <p>📧 {{ formateur.email }}</p>
+                    <p>📱 {{ formateur.tel }}</p>
+                    <p>🎯 <strong class="text-primary">{{ formateur.specialite }}</strong></p>
+                    @if (formateur.employeurId) {
+                    <p>🏢 {{ getEmployeurName(formateur.employeurId) }}</p>
+                    }
+                </div>
+
+                <p class="text-primary text-sm mb-4 line-clamp-2">{{ formateur.bio }}</p>
+
+                <div class="flex gap-2">
+                    <button (click)="editFormateur(formateur)" class="flex-1 btn-outline text-sm font-medium">
+                        ✏️ Edit
+                    </button>
+                    <button (click)="deleteFormateur(formateur)"
+                        class="flex-1 bg-base border border-base text-primary text-sm font-medium rounded transition">
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>

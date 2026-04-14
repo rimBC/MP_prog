@@ -1,0 +1,323 @@
+<div class="max-w-7xl mx-auto p-6 bg-base text-primary">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold text-primary mb-2">Participant Management</h1>
+            <p class="text-sec">Manage training participants/trainees</p>
+        </div>
+        <div class="flex gap-4 items-center">
+            <label class="flex items-center gap-2 cursor-pointer p-2 bg-sec rounded">
+                <input type="checkbox" [checked]="usingTestData" (change)="toggleTestDataMode()" class="rounded" />
+                <span class="text-sec text-sm">Test Data</span>
+            </label>
+            <button (click)="toggleForm()" class="px-6 py-2 btn-primary font-medium rounded-lg transition">
+                {{ showForm ? '✕ Cancel' : '✚ Add Participant' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (success) {
+    <div class="mb-6 p-4 bg-sec border border-base text-primary rounded-lg animate-fade-in">
+        <p class="font-medium">✓ {{ success }}</p>
+    </div>
+    }
+    @if (error) {
+    <div class="mb-6 p-4 bg-sec border border-base text-primary rounded-lg">
+        <p class="font-medium">✗ {{ error }}</p>
+    </div>
+    }
+
+    <!-- Add/Edit Form -->
+    @if (showForm) {
+    <div class="bg-sec rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-primary mb-6">{{ editingId ? 'Edit Participant' : 'Add New Participant' }}
+        </h2>
+
+        <form [formGroup]="participantForm" (ngSubmit)="submitForm()" class="space-y-6">
+
+            <!-- Row 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">First Name</label>
+                    <input type="text" formControlName="prenom"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none"
+                        [class.border-red-500]="submitted && f['prenom'].errors" />
+                    @if (submitted && f['prenom'].errors) {
+                    <div class="text-red-500 text-sm mt-1">
+                        @if (f['prenom'].errors['required']) { <span>First name is required</span> }
+                        @if (f['prenom'].errors['minlength']) { <span>Minimum 2 characters</span> }
+                    </div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Last Name</label>
+                    <input type="text" formControlName="nom"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none"
+                        [class.border-red-500]="submitted && f['nom'].errors" />
+                    @if (submitted && f['nom'].errors) {
+                    <div class="text-red-500 text-sm mt-1">
+                        @if (f['nom'].errors['required']) { <span>Last name is required</span> }
+                        @if (f['nom'].errors['minlength']) { <span>Minimum 2 characters</span> }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">Email</label>
+                    <input type="email" formControlName="email"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none"
+                        [class.border-red-500]="submitted && f['email'].errors" />
+                    @if (submitted && f['email'].errors) {
+                    <div class="text-red-500 text-sm mt-1">
+                        @if (f['email'].errors['required']) { <span>Email is required</span> }
+                        @if (f['email'].errors['email']) { <span>Invalid email format</span> }
+                    </div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Phone</label>
+                    <input type="tel" formControlName="tel"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none"
+                        [class.border-red-500]="submitted && f['tel'].errors" />
+                    @if (submitted && f['tel'].errors) {
+                    <div class="text-red-500 text-sm mt-1">
+                        @if (f['tel'].errors['required']) { <span>Phone is required</span> }
+                        @if (f['tel'].errors['minlength']) { <span>Minimum 10 digits</span> }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">Date of Hire</label>
+                    <input type="date" formControlName="dateEmbauche"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none" />
+                    @if (submitted && f['dateEmbauche'].errors) {
+                    <div class="text-red-500 text-sm mt-1">Date of hire is required</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Status</label>
+                    <select formControlName="actif"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none">
+                        <option [value]="true">Active</option>
+                        <option [value]="false">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sec font-medium mb-2">Department/Structure</label>
+                    <select formControlName="structureId"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none">
+                        <option value="">Select a department</option>
+                        @for (structure of structures; track structure) {
+                        <option [value]="structure.id">
+                            {{ structure.libelle }} ({{ structure.lieu }})
+                        </option>
+                        }
+                    </select>
+                    @if (submitted && f['structureId'].errors) {
+                    <div class="text-red-500 text-sm mt-1">Department is required</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sec font-medium mb-2">Job Profile</label>
+                    <select formControlName="profilId"
+                        class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none">
+                        <option value="">Select a profile</option>
+                        @for (profil of profils; track profil) {
+                        <option [value]="profil.id">{{ profil.libelle }}</option>
+                        }
+                    </select>
+                    @if (submitted && f['profilId'].errors) {
+                    <div class="text-red-500 text-sm mt-1">Profile is required</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4">
+                <button type="submit" [disabled]="loading"
+                    class="flex-1 btn-primary py-2 rounded-lg transition disabled:opacity-50">
+                    {{ editingId ? 'Update Participant' : 'Create Participant' }}
+                </button>
+                <button type="button" (click)="resetForm()"
+                    class="flex-1 bg-sec border border-base text-primary py-2 rounded-lg transition">
+                    Clear
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+
+    <!-- Filters Section -->
+    <div class="bg-sec rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-primary mb-4">Filters</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+                <label class="block text-sec font-medium mb-2">Search</label>
+                <input [value]="searchText"
+                    class="w-full px-4 py-2 bg-base border border-base rounded-lg outline-none" />
+            </div>
+
+            <div>
+                <label class="block text-sec font-medium mb-2">Department</label>
+                <select [value]="filterStructure" class="w-full px-4 py-2 bg-base border border-base rounded-lg">
+                    <option value="ALL">All Departments</option>
+                    @for (structure of structures; track structure) {
+                    <option [value]="structure.id">{{ structure.libelle }}</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sec font-medium mb-2">Job Profile</label>
+                <select [value]="filterProfil" class="w-full px-4 py-2 bg-base border border-base rounded-lg">
+                    <option value="ALL">All Profiles</option>
+                    @for (profil of profils; track profil) {
+                    <option [value]="profil.id">{{ profil.libelle }}</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sec font-medium mb-2">Status</label>
+                <select [value]="filterStatus" class="w-full px-4 py-2 bg-base border border-base rounded-lg">
+                    <option value="ALL">All Status</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                </select>
+            </div>
+
+            <div class="flex items-end">
+                <button (click)="resetFilters()" class="w-full btn-primary py-2 rounded-lg">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <p class="text-sec text-sm mt-4">
+            Showing {{ getFilteredParticipants().length }} of {{ participants.length }} participants
+        </p>
+    </div>
+
+    <!-- Participants Table -->
+    <div class="bg-sec rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-base">
+            <h2 class="text-xl font-bold text-primary">Participants List</h2>
+        </div>
+
+        @if (getFilteredParticipants().length === 0) {
+        <div class="p-8 text-center text-sec">
+            <p class="text-lg mb-2">No participants found</p>
+            <p class="text-sm">Try adjusting your filters or add a new participant</p>
+        </div>
+        }
+
+        @if (getFilteredParticipants().length > 0) {
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-base border-b border-base">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Name</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Email</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Department</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Profile</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Status</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Formations</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-sec">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (participant of getFilteredParticipants(); track participant) {
+                    <tr class="border-b border-base hover:bg-base transition">
+                        <td class="px-6 py-4">
+                            <p class="font-medium text-primary">{{ participant.prenom }} {{ participant.nom }}</p>
+                            <p class="text-sm text-sec">📱 {{ participant.tel }}</p>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <p class="text-primary">{{ participant.email }}</p>
+                            <p class="text-sm text-sec">📅 {{ formatDate(participant.dateEmbauche) }}</p>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <span class="inline-block px-3 py-1 bg-base-contrast text-white rounded-full text-sm">
+                                {{ participant.structureName }}
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <span class="inline-block px-3 py-1 bg-base text-primary rounded-full text-sm">
+                                {{ participant.profilName }}
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            @if (participant.actif) {
+                            <span class="px-3 py-1 bg-base-contrast text-white rounded-full text-sm">Active</span>
+                            }
+                            @else {
+                            <span class="px-3 py-1 bg-base text-sec rounded-full text-sm">Inactive</span>
+                            }
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-base text-primary rounded-full text-sm">
+                                📚 {{ participant.formationsCount }} formations
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2 flex-wrap">
+                                <button (click)="editParticipant(participant)" class="btn-outline text-sm">✏️</button>
+                                <button (click)="deleteParticipant(participant)"
+                                    class="bg-base border border-base text-primary text-sm rounded px-3 py-1">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+
+    <!-- Department Information Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
+        <div class="bg-sec p-4 rounded-lg border border-base">
+            <h3 class="font-bold text-primary mb-1 text-sm">IT Department</h3>
+            <p class="text-xs text-sec">Location: Tunis</p>
+        </div>
+        <div class="bg-sec p-4 rounded-lg border border-base">
+            <h3 class="font-bold text-primary mb-1 text-sm">HR Department</h3>
+            <p class="text-xs text-sec">Location: Sousse</p>
+        </div>
+        <div class="bg-sec p-4 rounded-lg border border-base">
+            <h3 class="font-bold text-primary mb-1 text-sm">Finance Department</h3>
+            <p class="text-xs text-sec">Location: Sfax</p>
+        </div>
+        <div class="bg-sec p-4 rounded-lg border border-base">
+            <h3 class="font-bold text-primary mb-1 text-sm">Marketing Department</h3>
+            <p class="text-xs text-sec">Location: Tunis</p>
+        </div>
+        <div class="bg-sec p-4 rounded-lg border border-base">
+            <h3 class="font-bold text-primary mb-1 text-sm">Operations Department</h3>
+            <p class="text-xs text-sec">Location: Sousse</p>
+        </div>
+    </div>
+</div>

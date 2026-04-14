@@ -4,25 +4,25 @@ export const MENU_ITEMS: MenuItem[] = [
       // Common items for all users
       {
         label: 'Home',
-        icon: 'icons/users.svg',
+        icon: 'icons/home.svg',
         route: '/user/dashboard',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       },
       {
         label: 'Formateurs',
-        icon: 'users.svg',
+        icon: 'icons/formateurs.svg',
         route: '/user/trainers',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       },
       {
         label: 'Formations',
-        icon: 'users.svg',
+        icon: 'icons/formation.svg',
         route: '/user/trainings',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       },
       {
         label: 'Participants',
-        icon: 'users.svg',
+        icon: 'icons/participants.svg',
         route: '/user/participants',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       },
@@ -31,13 +31,13 @@ export const MENU_ITEMS: MenuItem[] = [
       // Manager items
       {
         label: 'Statistique',
-        icon: 'users.svg',
+        icon: 'icons/stats.svg',
         route: '/manager/statistics',
         roles: ['RESPONSABLE', 'ADMINISTRATEUR']
       },
       {
         label: 'Reports',
-        icon: 'users.svg',
+        icon: 'icons/reports.svg',
         route: '/manager/reports',
         roles: ['RESPONSABLE', 'ADMINISTRATEUR']
       },
@@ -45,20 +45,20 @@ export const MENU_ITEMS: MenuItem[] = [
       // Admin items
       {
         label: 'Utilistateurs',
-        icon: 'users.svg',
+        icon: 'icons/users.svg',
         route: '/admin/users',
         roles: ['ADMINISTRATEUR']
       },
       
       {
         label: 'Configuration',
-        icon: 'users.svg',
+        icon: 'icons/settings.svg',
         route: '/admin/settings',
         roles: ['ADMINISTRATEUR']
       },
       {
         label: 'Support',
-        icon: 'users.svg',
+        icon: 'icons/contact.svg',
         route: '/contact',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       }

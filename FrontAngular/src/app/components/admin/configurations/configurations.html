@@ -1,9 +1,9 @@
-<div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 min-h-full ">
+<div class=" mx-auto p-4 sm:p-6 lg:p-8 min-h-full ">
 
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-primary mb-2">System Settings</h1>
-        <p class="text-gray-600">Manage domains, structures, and job profiles</p>
+        <h1 class="text-3xl font-bold text-primary mb-2">System Settings</h1>
+        <p class="text-sec">Manage domains, structures, and job profiles</p>
     </div>
 
     <!-- Error -->
@@ -21,9 +21,9 @@
     }
 
     <!-- Tabs -->
-    <div class="flex gap-4 mb-8 border-b border-gray-500/20 text-primary">
+    <div class="flex gap-4 mb-8 border-b border-gray-500/20 text-sec">
         <button (click)="switchTab('domains')" [class.text-primary]="activeTab === 'domains'"
-            [class.border-b-2]="activeTab === 'domains'" [class.border-slate-500]="activeTab === 'domains'"
+            [class.border-b-2]="activeTab === 'domains'" [class.border-sec]="activeTab === 'domains'"
             class="pb-3 px-4 font-medium transition-colors hover:border-b-2 flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="size-6">
@@ -35,7 +35,7 @@
         </button>
 
         <button (click)="switchTab('structures')" [class.text-primary]="activeTab === 'structures'"
-            [class.border-b-2]="activeTab === 'structures'" [class.border-primary]="activeTab === 'structures'"
+            [class.border-b-2]="activeTab === 'structures'" [class.border-sec]="activeTab === 'structures'"
             class="pb-3 px-4 font-medium transition-colors hover:border-b-2 flex gap-1 ">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="size-6">
@@ -63,16 +63,16 @@
 
         <!-- Form -->
         <div class="lg:col-span-1">
-            <div class="bg-white/90 rounded-lg shadow-lg p-6 sticky top-20">
-                <h2 class="text-xl font-bold text-gray-800 mb-6">
+            <div class="bg-sec rounded-lg shadow-lg p-6 sticky top-20">
+                <h2 class="text-xl font-bold text-primary mb-6">
                     {{ editingId ? 'Edit Domain' : 'Add Domain' }}
                 </h2>
 
                 <form [formGroup]="domaineForm" (ngSubmit)="submitDomaineForm()">
                     <div class="mb-4">
-                        <label class="block text-gray-700 font-medium mb-2">Domain Name</label>
+                        <label class="block text-primary font-medium mb-2">Domain Name</label>
                         <input type="text" formControlName="libelle"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-300/85 outline-none"
                             [class.border-red-500]="submitted && df['libelle'].errors" />
 
                         @if (submitted && df['libelle'].errors) {
@@ -88,19 +88,19 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-700 font-medium mb-2">Description</label>
+                        <label class="block text-primary font-medium mb-2">Description</label>
                         <textarea formControlName="description"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
                     </div>
 
                     <div class="flex gap-2">
                         <button type="submit" [disabled]="loading"
-                            class="flex-1 bg-blue-500 text-white py-2 rounded-lg">
+                            class="flex-1 btn btn-primary py-2 rounded-lg">
                             {{ editingId ? 'Update' : 'Create' }}
                         </button>
 
                         @if (editingId) {
-                        <button type="button" (click)="cancelEdit()" class="flex-1 bg-gray-300 py-2 rounded-lg">
+                        <button type="button" (click)="cancelEdit()" class="flex-1 bg-sec py-2 rounded-lg">
                             Cancel
                         </button>
                         }
@@ -110,15 +110,15 @@
         </div>
 
         <!-- List -->
-        <div class="lg:col-span-2">
-            <div class="bg-white/90 rounded-lg shadow-lg overflow-hidden">
+        <div class="lg:col-span-2 text-primary">
+            <div class="bg-sec rounded-lg shadow-lg overflow-hidden">
 
                 <div class="p-6 border-b">
                     <h3 class="text-lg font-bold">Existing Domains ({{ domaines.length }})</h3>
                 </div>
 
                 @if (domaines.length === 0) {
-                <div class="p-6 text-center text-gray-500">No domains created yet</div>
+                <div class="p-6 text-center text-sec">No domains created yet</div>
                 }
 
                 @for (domaine of domaines; track domaine.id) {
@@ -151,14 +151,14 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-lg">
+            <div class="bg-sec rounded-lg shadow-lg">
 
                 @if (structures.length === 0) {
-                <div class="p-6 text-center text-gray-500">No structures created yet</div>
+                <div class="p-6 text-center text-primary">No structures created yet</div>
                 }
 
                 @for (structure of structures; track structure.id) {
-                <div class="border-t p-4">
+                <div class="border-t p-4 ">
                     <h4 class="font-bold">{{ structure.libelle }}</h4>
 
                     @if (structure.lieu) {
@@ -181,10 +181,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-lg">
+            <div class="bg-sec rounded-lg shadow-lg">
 
                 @if (profils.length === 0) {
-                <div class="p-6 text-center text-gray-500">No profiles created yet</div>
+                <div class="p-6 text-center text-primary">No profiles created yet</div>
                 }
 
                 @for (profil of profils; track profil.id) {

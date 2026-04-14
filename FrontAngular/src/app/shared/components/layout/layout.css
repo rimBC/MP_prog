@@ -1,14 +1,26 @@
 .shimer {
     background: linear-gradient(to right,
-            #738291 20%,
+            #a09e9e 20%,
             #d6dbe0 30%,
-            #bbbfc4 70%,
-            #738291 80%);
+            #5d5e5e 70%,
+            #adaeae 80%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 500% auto;
-    animation: textShine 8s ease-in-out infinite reverse;
+    animation: textShine 10s ease-in-out infinite reverse;
+}
+.shimer3 {
+    background: linear-gradient(to right,
+            #767b9f 20%,
+            #d6dbe0 30%,
+            #6d778a 70%,
+            #cdcdcd 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 500% auto;
+    animation: textShine 10s ease-in-out infinite reverse;
 }
 
 @keyframes textShine {
@@ -20,7 +32,28 @@
         background-position: 100% 50%;
     }
 }
+.shimer2 {
+    background: linear-gradient(to right,
+            #0c0385 20%,
+            #052d55 30%,
+            #1d1196d4 70%,
+            #01154b 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 500% auto;
+    animation: textShine 10s ease-in-out infinite reverse;
+}
 
+@keyframes textShine {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
 .shimer:hover {
     background: transparent;
     -webkit-text-fill-color: white;

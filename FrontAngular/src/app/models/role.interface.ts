@@ -1,5 +1,5 @@
 interface Role {
   id: number;
   name: string;
-  description: string;
+  description?: string;
 }

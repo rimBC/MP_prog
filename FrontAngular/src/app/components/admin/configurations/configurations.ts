@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ReferenceDataService } from '../../core/services/refrence-dat.service';
+import { ReferenceDataService } from '../../../core/services/refrence-dat.service';
 import { RouterModule } from '@angular/router';
-import { Testing } from "../testing/testing";
+import { Testing } from "../../testing/testing";
 
 
 type SettingsTab = 'domains' | 'structures' | 'profiles';

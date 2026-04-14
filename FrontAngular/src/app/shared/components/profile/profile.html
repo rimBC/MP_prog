@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-base p-6">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Loading State -->
+        @if (loading) {
+        <div class="text-center py-12">
+            <p class="text-sec">Loading profile...</p>
+        </div>
+        }
+
+        <!-- Profile Header Card -->
+        @if (!loading && currentUser) {
+        <div class="bg-sec rounded-2xl shadow-lg overflow-hidden mb-8">
+
+            <div class="px-8 py-4">
+                <div class="flex flex-col md:flex-row md:items-end md:gap-8  mb-8 mt-6">
+
+                    <!-- Avatar -->
+                    <div class="shrink-0 mb-4 md:mb-0">
+                        <div
+                            class="w-50 h-50 rounded-2xl bg-base-contrast flex items-center justify-center text-white text-6xl font-bold shadow-xl">
+                            {{ currentUser.login.charAt(0).toUpperCase() }}
+                        </div>
+                    </div>
+
+                    <!-- User Info -->
+                    <div class="flex-1">
+                        <h1 class="text-4xl font-bold text-primary">
+                            {{ currentUser.login }}
+                        </h1>
+
+                        <p class="text-sec text-lg mt-2">
+                            {{ userParticipant?.profilName || 'User' }}
+                        </p>
+
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            <span
+                                [class]="'px-4 py-2 rounded-full text-sm font-semibold ' + getRoleColor(currentUser.role)">
+                                {{ getRoleDisplayName(currentUser.role) }}
+                            </span>
+
+                            <span class="px-4 py-2 bg-base-contrast text-white rounded-full text-sm font-semibold">
+                                {{ userParticipant?.structureName || 'Active Member' }}
+                            </span>
+                        </div>
+
+                        <div class="mt-4 space-y-2 text-sec">
+                            <p><span class="font-semibold text-primary">Email:</span> {{ userParticipant?.email || 'N/A'
+                                }}</p>
+                            <p><span class="font-semibold text-primary">Phone:</span> {{ userParticipant?.tel || 'N/A'
+                                }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+        }
+
+        <!-- Stats -->
+        @if (!loading && currentUser) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+            <div class="bg-sec rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+                <p class="text-sec text-sm mb-1">Formations Attended</p>
+                <p class="text-4xl font-bold text-primary">{{ userStats.formationsAttended }}</p>
+            </div>
+
+            <div class="bg-sec rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+                <p class="text-sec text-sm mb-1">Completed</p>
+                <p class="text-4xl font-bold text-green-400">{{ userStats.formationsCompleted }}</p>
+            </div>
+
+            <div class="bg-sec rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+                <p class="text-sec text-sm mb-1">Hours Learned</p>
+                <p class="text-4xl font-bold text-purple-400">{{ userStats.hoursLearned }}</p>
+            </div>
+
+            <div class="bg-sec rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+                <p class="text-sec text-sm mb-1">Certificates</p>
+                <p class="text-4xl font-bold text-yellow-400">{{ userStats.certificatesEarned }}</p>
+            </div>
+
+        </div>
+        }
+
+        <!-- Current Formations -->
+        @if (!loading && userStats.currentFormations.length > 0) {
+        <div class="bg-sec rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-primary mb-6">📖 Currently Attending</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @for (formation of userStats.currentFormations; track formation) {
+                <div class="border border-base rounded-lg p-4 hover:border-base-contrast transition">
+                    <h3 class="font-semibold text-primary">{{ formation.titre }}</h3>
+                    <p class="text-sm text-sec">{{ formation.domaineName }}</p>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Completed -->
+        @if (!loading && userStats.completedFormations.length > 0) {
+        <div class="bg-sec rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-primary mb-6">✓ Completed Formations</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @for (formation of userStats.completedFormations; track formation) {
+                <div class="border border-base rounded-lg p-4 bg-base">
+                    <h3 class="text-primary">{{ formation.titre }}</h3>
+                    <p class="text-sec">{{ formation.domaineName }}</p>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Recent -->
+        @if (!loading && recentFormations.length > 0) {
+        <div class="bg-sec rounded-xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-primary mb-6">📋 Recent Activity</h2>
+
+            @for (formation of recentFormations; track formation) {
+            <div class="p-4 border-l-4 border-base-contrast bg-base rounded mb-3">
+                <h4 class="font-semibold text-primary">{{ formation.titre }}</h4>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Empty -->
+        @if (!loading && recentFormations.length === 0) {
+        <div class="bg-sec rounded-xl shadow-lg p-12 text-center">
+            <p class="text-sec text-lg mb-4">No formations yet</p>
+        </div>
+        }
+
+    </div>
+</div>
