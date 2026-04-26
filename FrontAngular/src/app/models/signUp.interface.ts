@@ -1,4 +1,3 @@
-
 export interface SignUpRequest {
   login: string;
   password: string;
@@ -11,5 +10,11 @@ export interface SignUpResponse {
   login: string;
   role: string;
   success: boolean;
+  message: string;
+}
+
+export interface AvailabilityResponse {
+  login: string;
+  available: boolean;
   message: string;
 }

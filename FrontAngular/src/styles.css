@@ -41,6 +41,12 @@
 
             --color-pastel-yellow: #FFFD82;
 
+            --color-btn-primary: #33619a;
+            --color-btn-sec: #aad3ff;
+            --text-btn-sec: #216ebf;
+            --text-btn-primary: #e8e8e8;
+            --color-border: #cbccce;
+            --text-btn-outline: #2e578a;
 }
 
 /* =========================
@@ -66,14 +72,18 @@
 
     --color-surface: #17181c;
     /* bg */
-    --color-bg:#252525;
+    --color-bg:#242424;
     --color-bg-sec: #292929;
 
     --color-bg-sec2:hsl(0, 0%, 22%);
     --color-bg-contrast: #33619a;
     /* button */
-    --color-btn-primary: #33619a;
-    --color-btn-sec: #020101;
+    --color-btn-primary: #3c6598;
+    --color-btn-sec: #51667e;
+    --text-btn-sec: #bad7f4;
+    --text-btn-primary: #e8ecf6f9;
+    --color-border: #515151;
+    --text-btn-outline: #b4b4b4;
 
     --color-primary-50: #021122;
     --color-primary-100: #053161;
@@ -120,31 +130,40 @@
         }
     
         .btn {
-            @apply inline-flex items-center justify-center text-nowrap gap-2.5 px-3 py-2 rounded-3xl tracking-wider shadow-md text-xs md:text-sm hover:bg-gray-600/5 font-semibold;
+            @apply inline-flex items-center justify-center text-nowrap gap-2.5 px-3 py-1.5 rounded-3xl tracking-wider shadow-md text-xs md:text-sm hover:bg-gray-600/5 font-semibold;
         } 
         
     
         .article {
             @apply flex items-center justify-center gap-5 px-4 text-red-900 font-medium
         }
+        
 }
 @layer utilities {
 
-
+    .btn-outline {
+        opacity: 90%;
+        color: var(--text-btn-outline);
+        border-color: var(--text-btn-outline);
+        border-width: 1.5px;
+    }
     .btn-primary {
-        color:  #e9e9e9;
-        background-color: var(--color-btn-primary);}
+        color: var(--text-btn-primary);
+        background-color: var(--color-btn-primary);
+        border-color: var(--color-btn-primary);
+        border-width: 1.5px;
+        font-weight:light;
+    }
+    .btn-sec {
+            color:var(--text-btn-sec);
+            background-color: var(--color-btn-sec);
+        }
     .btn-primary:hover {
-            background-color: #487bbdf5;
-        
+            background-color: #487bbdf5;        
             opacity: 90%;
             
                 }
-            
-    .btn-outline {
-        @apply text-slate-300 bg-blue-400/5 hover:text-white border-2 border-slate-200/90;
-            
-                }
+    
     .scrollbar-hide {
         scrollbar-width: none;
     }
@@ -153,16 +172,7 @@
         }
         .bg-nav-top {
             background-color: var(--color-nav-top);}
-        .bg-base {
-                    background-color: var(--color-bg);
-                }
-        .bg-sec {
-            background-color: var(--color-bg-sec);
-                                }
-        .bg-base-contrast {
-                    background-color: var(--color-bg-contrast);
-                }
-    
+       
         .text-sec {
             color: var(--color-text-sec);
         }
@@ -177,6 +187,20 @@
     
         .bg-primary-hover:hover {
             background-color: var(--color-primary-800);
+        }
+         .bg-base {
+             background-color: var(--color-bg);
+         }
+
+         .bg-sec {
+             background-color: var(--color-bg-sec);
+         }
+
+        .bg-base-contrast {
+             background-color: var(--color-bg-contrast);
+         }
+        .myBorder {
+            border-color: var(--color-border);
         }
         
 }

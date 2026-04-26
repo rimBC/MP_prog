@@ -105,19 +105,18 @@ export class UserManagement implements OnInit{
       roleId: parseInt(this.createUserForm.get('roleId')?.value)
     };
  
-    this.authService.createAdmin(request).subscribe({
+    this.authService.signUp(request).subscribe({
       next: (response: SignUpResponse) => {
         this.loading = false;
         this.success = `User '${response.login}' created successfully with role '${response.role}'`;
         this.createUserForm.reset();
         this.submitted = false;
-        
-        // Clear success message after 5 seconds
+
         setTimeout(() => {
           this.success = null;
         }, 5000);
       },
-      error: (error) => {
+      error: (error: any) => {
         this.loading = false;
         this.error = error.error?.message || 'Failed to create user. Please try again.';
       }

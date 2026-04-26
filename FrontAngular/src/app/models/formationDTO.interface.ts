@@ -1,17 +1,19 @@
 export interface FormationDTO {
-  id: number;
+  id?: number;
   titre: string;
   annee: number;
   duree: number;
-  budget: number;
-  lieu: string;
-  dateDebut: string;
-  dateFin: string;
-  statut: string;
-  description: string;
-  domaineId: number;
-  domaineName?: string;
-  formateurId: number;
+  domaineId?: number;
+  domaineLibelle?: string;
+  budget?: number;
+  formateurId?: number;
   formateurNom?: string;
-  participantCount?: number;
+  lieu?: string;
+  dateDebut?: string;
+  dateFin?: string;
+  dateCreation?: string;
+  statut?: string;
+  description?: string;
+  participantIds?: number[];
+  nombreParticipants?: number;
 }

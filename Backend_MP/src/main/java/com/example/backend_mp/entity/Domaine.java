@@ -6,10 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Domaine entity representing training domains/fields
- * Examples: IT, Finance, Accounting, Mechanics, etc.
- */
+
 @Entity
 @Table(name = "domaine", uniqueConstraints = @UniqueConstraint(columnNames = "libelle"))
 @Data

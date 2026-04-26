@@ -1,0 +1,165 @@
+@if (isOpen) {
+<div data-backdrop="true"
+    class="fixed inset-0 z-10 flex items-center justify-center p-8 bg-black/50 backdrop-blur-xs modal-backdrop ml-16 mt-14"
+    (click)="onBackdropClick($event)">
+
+    <div
+        class="bg-sec rounded-lg shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-3xl max-h-[85vh] flex flex-col modal-panel">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b myBorder">
+            <h2 class="text-2xl font-bold text-primary">{{ title }}</h2>
+            <button type="button" (click)="close()"
+                class="w-8 h-8 rounded-full flex items-center justify-center text-sec hover:bg-base hover:text-primary transition"
+                aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto px-6 py-6">
+            <form [formGroup]="formationForm" (ngSubmit)="submitForm()" class="space-y-6" id="formationModalForm">
+
+                <!-- Row 1: Title & Domain -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Title</label>
+                        <input type="text" formControlName="titre"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="e.g., Advanced Angular Development"
+                            [class.border-red-500]="submitted && f['titre'].errors" />
+                        @if (submitted && f['titre'].errors) {
+                        <div class="text-red-500 text-xs mt-1">
+                            @if (f['titre'].errors['required']) { <span>Title is required</span> }
+                            @else if (f['titre'].errors['minlength']) { <span>Minimum 5 characters</span> }
+                        </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Domain</label>
+                        <select formControlName="domaineId"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            [class.border-red-500]="submitted && f['domaineId'].errors">
+                            <option value="">Select a domain</option>
+                            @for (domain of domaines; track domain.id) {
+                            <option [value]="domain.id">{{ domain.libelle }}</option>
+                            }
+                        </select>
+                        @if (submitted && f['domaineId'].errors?.['required']) {
+                        <div class="text-red-500 text-xs mt-1">Domain is required</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Row 2: Duration / Budget / Year -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Duration (hours)</label>
+                        <input type="number" formControlName="duree"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="40" [class.border-red-500]="submitted && f['duree'].errors" />
+                    </div>
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Budget ($)</label>
+                        <input type="number" formControlName="budget"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="5000" [class.border-red-500]="submitted && f['budget'].errors" />
+                    </div>
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Year</label>
+                        <select formControlName="annee"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none">
+                            @for (year of getAvailableYears(); track year) {
+                            <option [value]="year">{{ year }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 3: Dates -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Start Date</label>
+                        <input type="date" formControlName="dateDebut"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            [class.border-red-500]="submitted && f['dateDebut'].errors" />
+                    </div>
+                    <div>
+                        <label class="block text-sec font-medium mb-2">End Date</label>
+                        <input type="date" formControlName="dateFin"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            [class.border-red-500]="submitted && f['dateFin'].errors" />
+                        @if (formationForm.errors?.['dateRange']) {
+                        <div class="text-red-500 text-xs mt-1">End date must be after start date</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Row 4: Location & Trainer -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Location</label>
+                        <input type="text" formControlName="lieu"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="e.g., Tunis" [class.border-red-500]="submitted && f['lieu'].errors" />
+                    </div>
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Trainer</label>
+                        <select formControlName="formateurId"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            [class.border-red-500]="submitted && f['formateurId'].errors">
+                            <option value="">Select a trainer</option>
+                            @for (formateur of formateurs; track formateur.id) {
+                            <option [value]="formateur.id">
+                                {{ formateur.prenom }} {{ formateur.nom }} ({{ formateur.type }})
+                            </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Status</label>
+                        <select formControlName="statut"
+                            class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none">
+                            @for (status of statuses; track status.value) {
+                            <option [value]="status.value">{{ status.label }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sec font-medium mb-2">Description</label>
+                    <textarea formControlName="description"
+                        class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                        rows="3" placeholder="Training description and objectives"
+                        [class.border-red-500]="submitted && f['description'].errors"></textarea>
+                    @if (submitted && f['description'].errors?.['minlength']) {
+                    <div class="text-red-500 text-xs mt-1">Description must be at least 10 characters</div>
+                    }
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-4 px-6 py-4 border-t myBorder">
+            <button type="submit" form="formationModalForm" [disabled]="loading"
+                class="flex-1 btn-primary py-2 rounded-lg transition disabled:opacity-50">
+                {{ loading ? 'Saving…' : (isEditing ? 'Update Formation' : 'Create Formation') }}
+            </button>
+
+            <button type="button" (click)="close()"
+                class="flex-1 bg-sec border myBorder text-primary py-2 rounded-lg transition hover:bg-base">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+}

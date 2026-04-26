@@ -1,0 +1,156 @@
+@if (isOpen) {
+<div data-backdrop="true"
+    class="fixed inset-0 z-10 flex items-center justify-center p-8 bg-black/50 backdrop-blur-xs modal-backdrop ml-16 mt-14"
+    (click)="onBackdropClick($event)">
+
+    <div
+        class="bg-base rounded-lg shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl max-h-[85vh] flex flex-col modal-panel">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b myBorder">
+            <h2 class="text-2xl font-bold text-primary">{{ title }}</h2>
+            <button type="button" (click)="close()"
+                class="w-8 h-8 rounded-full flex items-center justify-center text-sec hover:bg-sec hover:text-primary transition"
+                aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto px-6 py-6">
+            <form [formGroup]="participantForm" (ngSubmit)="submitForm()" class="space-y-6" id="participantModalForm">
+
+                <!-- Row 1 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">First Name</label>
+                        <input type="text" formControlName="prenom"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="First name" [class.border-red-500]="submitted && f['prenom'].errors" />
+                        @if (submitted && f['prenom'].errors) {
+                        <div class="text-red-500 text-xs mt-1">
+                            @if (f['prenom'].errors['required']) { <span>First name is required</span> }
+                            @else if (f['prenom'].errors['minlength']) { <span>Minimum 2 characters</span> }
+                        </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Last Name</label>
+                        <input type="text" formControlName="nom"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="Last name" [class.border-red-500]="submitted && f['nom'].errors" />
+                        @if (submitted && f['nom'].errors) {
+                        <div class="text-red-500 text-xs mt-1">
+                            @if (f['nom'].errors['required']) { <span>Last name is required</span> }
+                            @else if (f['nom'].errors['minlength']) { <span>Minimum 2 characters</span> }
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Email</label>
+                        <input type="email" formControlName="email"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="email@company.com" [class.border-red-500]="submitted && f['email'].errors" />
+                        @if (submitted && f['email'].errors) {
+                        <div class="text-red-500 text-xs mt-1">
+                            @if (f['email'].errors['required']) { <span>Email is required</span> }
+                            @else if (f['email'].errors['email']) { <span>Invalid email format</span> }
+                        </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Phone</label>
+                        <input type="tel" formControlName="tel"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
+                            placeholder="216 9X XXX XXX" [class.border-red-500]="submitted && f['tel'].errors" />
+                        @if (submitted && f['tel'].errors) {
+                        <div class="text-red-500 text-xs mt-1">
+                            @if (f['tel'].errors['required']) { <span>Phone is required</span> }
+                            @else if (f['tel'].errors['minlength']) { <span>Minimum 10 digits</span> }
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2 ">Date of Hire</label>
+                        <input type="date" formControlName="dateEmbauche"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none h-11"
+                            [class.border-red-500]="submitted && f['dateEmbauche'].errors" />
+                        @if (submitted && f['dateEmbauche'].errors) {
+                        <div class="text-red-500 text-xs mt-1">Date of hire is required</div>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Status</label>
+                        <select formControlName="actif"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none h-11">
+                            <option [ngValue]="true">Active</option>
+                            <option [ngValue]="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Department / Structure</label>
+                        <select formControlName="structureId"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none h-11"
+                            [class.border-red-500]="submitted && f['structureId'].errors">
+                            <option value="">Select a department</option>
+                            @for (structure of structures; track structure.id) {
+                            <option [value]="structure.id">
+                                {{ structure.libelle }}@if (structure.lieu) { <span> ({{ structure.lieu }})</span> }
+                            </option>
+                            }
+                        </select>
+                        @if (submitted && f['structureId'].errors) {
+                        <div class="text-red-500 text-xs mt-1">Department is required</div>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="block text-sec font-medium mb-2">Job Profile</label>
+                        <select formControlName="profilId"
+                            class="w-full px-4 py-2 bg-sec border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none h-11"
+                            [class.border-red-500]="submitted && f['profilId'].errors">
+                            <option value="">Select a profile</option>
+                            @for (profil of profils; track profil.id) {
+                            <option [value]="profil.id">{{ profil.libelle }}</option>
+                            }
+                        </select>
+                        @if (submitted && f['profilId'].errors) {
+                        <div class="text-red-500 text-xs mt-1">Profile is required</div>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-4 px-6 py-4 border-t myBorder">
+            <button type="submit" form="participantModalForm" [disabled]="loading"
+                class="flex-1 btn-primary py-2 rounded-lg transition disabled:opacity-50">
+                {{ loading ? 'Saving…' : (isEditing ? 'Update Participant' : 'Create Participant') }}
+            </button>
+
+            <button type="button" (click)="close()"
+                class="flex-1 bg-sec border myBorder text-primary py-2 rounded-lg transition hover:bg-sec">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+}

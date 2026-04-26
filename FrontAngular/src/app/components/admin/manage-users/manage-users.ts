@@ -1,225 +1,228 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService, UtilisateurDTO,Role } from '../../../core/services/user.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { UserService, Role } from '../../../core/services/user.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { UtilisateurDTO } from '../../../models/user.interface';
+import { ThemeService } from '../../../core/services/theme.service';
+import { MyTableLayout } from '../../../shared/components/my-table-layout/my-table-layout';
+import { UserModal, UserFormPayload } from './user-modal/user-modal';
 
 @Component({
   selector: 'app-manage-users',
-  imports: [],
+  imports: [CommonModule, FormsModule, MyTableLayout, UserModal],
   templateUrl: './manage-users.html',
   styleUrl: './manage-users.css',
 })
 export class ManageUsers implements OnInit {
-  
+
   utilisateurs: UtilisateurDTO[] = [];
   roles: Role[] = [];
-  
-  // State
+
   loading = false;
   error: string | null = null;
   success: string | null = null;
-  selectedUser: UtilisateurDTO | null = null;
-  showChangeRoleModal = false;
-  
+
+  // Modal state
+  modalOpen = false;
+  editingUser: UtilisateurDTO | null = null;
+
   // Filters
   filterRole = 'ALL';
   filterStatus = 'ALL';
   searchText = '';
-  
-  // Test data mode
-  usingTestData = true;
- 
-  constructor(private userService: UserService) { }
- 
+
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+    private themeService: ThemeService,
+  ) {}
+
+  get isDark(): boolean {
+    return this.themeService.isDark();
+  }
+
   ngOnInit(): void {
     this.loadData();
   }
- 
-  /**
-   * Load all data
-   */
+
   private loadData(): void {
-    this.usingTestData = this.userService.isUsingTestData();
-    
-    // Subscribe to roles
-    this.userService.roles$.subscribe(roles => {
-      this.roles = roles;
-    });
- 
-    // Subscribe to users
-    this.userService.utilisateurs$.subscribe(users => {
-      this.utilisateurs = users;
-    });
- 
-    // Load data
+    this.userService.roles$.subscribe(roles => this.roles = roles);
+    this.userService.utilisateurs$.subscribe(users => this.utilisateurs = users);
+
     this.userService.loadRoles();
     this.userService.loadUtilisateurs();
   }
- 
-  /**
-   * Get filtered users
-   */
+
   getFilteredUsers(): UtilisateurDTO[] {
     return this.utilisateurs.filter(user => {
-      // Filter by role
-      if (this.filterRole !== 'ALL' && user.role !== this.filterRole) {
-        return false;
-      }
- 
-      // Filter by status
-      if (this.filterStatus === 'ACTIVE' && !user.actif) {
-        return false;
-      }
-      if (this.filterStatus === 'INACTIVE' && user.actif) {
-        return false;
-      }
- 
-      // Filter by search text
+      if (this.filterRole !== 'ALL' && user.roleName !== this.filterRole) return false;
+      if (this.filterStatus === 'ACTIVE' && !user.actif) return false;
+      if (this.filterStatus === 'INACTIVE' && user.actif) return false;
+
       if (this.searchText) {
-        const searchLower = this.searchText.toLowerCase();
-        return user.login.toLowerCase().includes(searchLower);
+        return user.login.toLowerCase().includes(this.searchText.toLowerCase());
       }
- 
       return true;
     });
   }
- 
-  /**
-   * Open change role modal
-   */
-  openChangeRoleModal(user: UtilisateurDTO): void {
-    this.selectedUser = { ...user };
-    this.showChangeRoleModal = true;
-    this.error = null;
+
+  openCreateModal(): void {
+    this.editingUser = null;
+    this.modalOpen = true;
   }
- 
-  /**
-   * Close modal
-   */
+
+  editUser(user: UtilisateurDTO): void {
+    this.editingUser = { ...user };
+    this.modalOpen = true;
+  }
+
   closeModal(): void {
-    this.showChangeRoleModal = false;
-    this.selectedUser = null;
+    this.modalOpen = false;
+    this.editingUser = null;
   }
- 
-  /**
-   * Change user role
-   */
-  changeRole(roleId: number): void {
-    if (!this.selectedUser) return;
- 
-    this.loading = true;
+
+  handleSave(event: { data: UserFormPayload; editingId: number | null }): void {
     this.error = null;
     this.success = null;
- 
-    this.userService.changeUserRole(this.selectedUser.id, roleId).subscribe({
-      next: (updated) => {
-        this.loading = false;
-        const role = this.roles.find(r => r.id === roleId);
-        this.success = `User '${this.selectedUser?.login}' role changed to '${role?.nom}'`;
-        this.closeModal();
-        setTimeout(() => this.success = null, 5000);
-      },
-      error: (error) => {
-        this.loading = false;
-        this.error = error.error?.message || 'Failed to change user role';
-      }
-    });
+    this.loading = true;
+
+    const { data, editingId } = event;
+
+    if (editingId) {
+      this.applyEdits(editingId, data);
+    } else {
+      this.authService.signUp({
+        login: data.login,
+        password: data.password ?? '',
+        passwordConfirm: data.passwordConfirm ?? '',
+        roleId: data.roleId,
+      }).subscribe({
+        next: () => {
+          this.loading = false;
+          this.success = `User '${data.login}' created successfully`;
+          this.closeModal();
+          this.userService.loadUtilisateurs();
+          setTimeout(() => this.success = null, 5000);
+        },
+        error: (err) => {
+          this.loading = false;
+          this.error = err.error?.message || 'Failed to create user';
+        },
+      });
+    }
   }
- 
-  /**
-   * Activate user
-   */
-  activateUser(user: UtilisateurDTO): void {
-    if (!confirm(`Are you sure you want to activate user '${user.login}'?`)) {
+
+  private applyEdits(userId: number, data: UserFormPayload): void {
+    const original = this.utilisateurs.find(u => u.id === userId);
+    if (!original) {
+      this.loading = false;
       return;
     }
- 
-    this.userService.activateUser(user.id).subscribe({
-      next: () => {
-        this.success = `User '${user.login}' activated`;
-        setTimeout(() => this.success = null, 5000);
-      },
-      error: (error) => {
-        this.error = error.error?.message || 'Failed to activate user';
+
+    const tasks: { run: () => void; label: string }[] = [];
+
+    if (data.role !== original.roleName) {
+      const role = this.roles.find(r => r.nom === data.role);
+      if (role) {
+        tasks.push({
+          label: 'role',
+          run: () => this.userService.changeUserRole(userId, role.id).subscribe({
+            next: () => this.advance(tasks, data),
+            error: (err) => this.failEdit(err, 'change role'),
+          }),
+        });
       }
-    });
-  }
- 
-  /**
-   * Deactivate user
-   */
-  deactivateUser(user: UtilisateurDTO): void {
-    if (!confirm(`Are you sure you want to deactivate user '${user.login}'?`)) {
+    }
+
+    if (data.actif !== original.actif) {
+      tasks.push({
+        label: 'status',
+        run: () => {
+          const op$ = data.actif
+            ? this.userService.activateUser(userId)
+            : this.userService.deactivateUser(userId);
+          op$.subscribe({
+            next: () => this.advance(tasks, data),
+            error: (err) => this.failEdit(err, 'change status'),
+          });
+        },
+      });
+    }
+
+    if (tasks.length === 0) {
+      this.loading = false;
+      this.success = 'No changes to save';
+      this.closeModal();
+      setTimeout(() => this.success = null, 3000);
       return;
     }
- 
-    this.userService.deactivateUser(user.id).subscribe({
-      next: () => {
-        this.success = `User '${user.login}' deactivated`;
-        setTimeout(() => this.success = null, 5000);
-      },
-      error: (error) => {
-        this.error = error.error?.message || 'Failed to deactivate user';
-      }
-    });
+
+    tasks[0].run();
   }
- 
-  /**
-   * Delete user
-   */
+
+  private advance(tasks: { run: () => void; label: string }[], data: UserFormPayload): void {
+    tasks.shift();
+    if (tasks.length > 0) {
+      tasks[0].run();
+      return;
+    }
+    this.loading = false;
+    this.success = `User '${data.login}' updated successfully`;
+    this.closeModal();
+    setTimeout(() => this.success = null, 5000);
+  }
+
+  private failEdit(err: any, action: string): void {
+    this.loading = false;
+    this.error = err.error?.message || `Failed to ${action}`;
+  }
+
   deleteUser(user: UtilisateurDTO): void {
     if (!confirm(`Are you sure you want to delete user '${user.login}'? This action cannot be undone.`)) {
       return;
     }
- 
+
     this.userService.deleteUser(user.id).subscribe({
       next: () => {
         this.success = `User '${user.login}' deleted`;
         setTimeout(() => this.success = null, 5000);
       },
-      error: (error) => {
-        this.error = error.error?.message || 'Failed to delete user';
-      }
+      error: (err) => {
+        this.error = err.error?.message || 'Failed to delete user';
+      },
     });
   }
- 
-  /**
-   * Get role name display
-   */
-  getRoleDisplay(role: string): string {
+
+  getRoleDisplay(role: string | undefined): string {
+    if (!role) return '';
     const roleMap: { [key: string]: string } = {
-      'SIMPLE_UTILISATEUR': 'Simple User',
-      'RESPONSABLE': 'Manager',
-      'ADMINISTRATEUR': 'Administrator'
+      SIMPLE_UTILISATEUR: 'Simple User',
+      RESPONSABLE: 'Manager',
+      ADMINISTRATEUR: 'Administrator',
     };
     return roleMap[role] || role;
   }
- 
-  /**
-   * Get role color
-   */
-  getRoleColor(role: string): string {
-    const colorMap: { [key: string]: string } = {
-      'SIMPLE_UTILISATEUR': 'bg-blue-100 text-blue-800',
-      'RESPONSABLE': 'bg-green-100 text-green-800',
-      'ADMINISTRATEUR': 'bg-purple-100 text-purple-800'
+
+  getRoleBadgeClass(role: string | undefined): string {
+    if (!role) return 'bg-base text-primary';
+    const lightMap: { [key: string]: string } = {
+      SIMPLE_UTILISATEUR: 'bg-blue-100 text-slate-700',
+      RESPONSABLE: 'bg-rose-100 text-rose-900',
+      ADMINISTRATEUR: 'bg-violet-100 text-violet-700',
     };
-    return colorMap[role] || 'bg-gray-100 text-gray-800';
+    const darkMap: { [key: string]: string } = {
+      SIMPLE_UTILISATEUR: 'bg-sky-900/40 text-sky-200',
+      RESPONSABLE: 'bg-red-900/40 text-red-200',
+      ADMINISTRATEUR: 'bg-violet-900/40 text-violet-200',
+    };
+    const map = this.isDark ? darkMap : lightMap;
+    return map[role] || 'bg-base text-primary';
   }
- 
-  /**
-   * Reset filters
-   */
+
   resetFilters(): void {
     this.filterRole = 'ALL';
     this.filterStatus = 'ALL';
     this.searchText = '';
-  }
- 
-  /**
-   * Toggle test data mode
-   */
-  toggleTestDataMode(): void {
-    this.usingTestData = !this.usingTestData;
-    this.userService.setTestDataMode(this.usingTestData);
-    this.loadData();
   }
 }

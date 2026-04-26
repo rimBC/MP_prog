@@ -20,9 +20,6 @@ import { Profile } from './shared/components/profile/profile';
 import { ManageFormateur } from './components/user/manage-formateur/manage-formateur';
 import { ManageParticipants } from './components/user/manage-participants/manage-participants';
 
-// Dashboard Components (will be created)
-// import { DashboardComponent } from './features/dashboard/dashboard.component';
-
 export const routes: Routes = [
   // Auth routes (no guard - public)
   {
@@ -102,7 +99,7 @@ export const routes: Routes = [
   },
 
   // Default redirect
-  { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
 
   // Wildcard route
   { path: '**', redirectTo: '/auth/login' }

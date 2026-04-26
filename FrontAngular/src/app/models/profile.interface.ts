@@ -1,5 +1,8 @@
-interface Profil {
+export interface ProfilDTO {
   id?: number;
-  libelle: string;      // Name (required)
-  description?: string; // Description (optional)
+  libelle: string;
+  description?: string;
+  nombreParticipants?: number;
 }
+
+export type Profil = ProfilDTO;

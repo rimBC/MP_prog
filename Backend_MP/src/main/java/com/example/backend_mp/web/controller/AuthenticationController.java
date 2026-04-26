@@ -43,7 +43,6 @@ public class AuthenticationController {
     @Operation(summary = "User registration", description = "Register a new user account")
     public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         AuthenticationController.log.info("Sign-up request for user: {}", signUpRequest.getLogin());
-        System.out.print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         SignUpResponse response = authenticationService.signUp(signUpRequest);
 
         if (response.isSuccess()) {

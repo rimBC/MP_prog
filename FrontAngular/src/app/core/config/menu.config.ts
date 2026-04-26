@@ -61,5 +61,5 @@ export const MENU_ITEMS: MenuItem[] = [
         icon: 'icons/contact.svg',
         route: '/contact',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
-      }
+      },
     ];

@@ -1,5 +1,8 @@
-interface Domaine {
+export interface DomaineDTO {
   id?: number;
-  libelle: string;      // Name (required)
-  description?: string; // Description (optional)
+  libelle: string;
+  description?: string;
+  nombreFormations?: number;
 }
+
+export type Domaine = DomaineDTO;

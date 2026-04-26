@@ -91,7 +91,7 @@ public class SecurityConfig {
                     .requestMatchers("/error").permitAll() // Add this
 
                     .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/api/swagger-ui/**","/swagger-ui/**", "/v3/api-docs/**", "/api/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
 
                 // Formateur endpoints
                 .requestMatchers(HttpMethod.GET, "/api/formateurs/**").hasAnyRole("SIMPLE_UTILISATEUR", "RESPONSABLE", "ADMINISTRATEUR")

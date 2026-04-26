@@ -1,6 +1,9 @@
-interface Structure {
+export interface StructureDTO {
   id?: number;
-  libelle: string;      // Name (required)
-  description?: string; // Description (optional)
-  lieu?: string;        // Location (optional)
+  libelle: string;
+  description?: string;
+  lieu?: string;
+  nombreParticipants?: number;
 }
+
+export type Structure = StructureDTO;

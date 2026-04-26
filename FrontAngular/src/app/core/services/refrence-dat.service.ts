@@ -1,267 +1,285 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { DomaineDTO, Domaine } from '../../models/domaine.interface';
+import { StructureDTO, Structure } from '../../models/structure.interface';
+import { ProfilDTO, Profil } from '../../models/profile.interface';
+import { EmployeurDTO, Employeur } from '../../models/employeur.interface';
 
-
+export type { DomaineDTO, Domaine, StructureDTO, Structure, ProfilDTO, Profil, EmployeurDTO, Employeur };
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReferenceDataService {
-  
+
   private apiUrl = 'http://localhost:8080/api/reference';
-  
-  // Domaines
-  private domainesSubject = new BehaviorSubject<Domaine[]>([]);
+
+  private domainesSubject = new BehaviorSubject<DomaineDTO[]>([]);
   public domaines$ = this.domainesSubject.asObservable();
-  
-  // Structures
-  private structuresSubject = new BehaviorSubject<Structure[]>([]);
+
+  private structuresSubject = new BehaviorSubject<StructureDTO[]>([]);
   public structures$ = this.structuresSubject.asObservable();
-  
-  // Profils
-  private profilsSubject = new BehaviorSubject<Profil[]>([]);
+
+  private profilsSubject = new BehaviorSubject<ProfilDTO[]>([]);
   public profils$ = this.profilsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.loadAllData();
+  private employeursSubject = new BehaviorSubject<EmployeurDTO[]>([]);
+  public employeurs$ = this.employeursSubject.asObservable();
+
+  constructor(private http: HttpClient) { }
+
+  // ==================== DOMAINES ====================
+
+  /** GET /api/reference/domaines */
+  getDomaines(): Observable<DomaineDTO[]> {
+    return this.http.get<DomaineDTO[]>(`${this.apiUrl}/domaines`).pipe(
+      tap(data => this.domainesSubject.next(data)),
+      catchError(error => {
+        console.error('Error loading domaines:', error);
+        return of([]);
+      })
+    );
   }
 
-  /**
-   * Load all reference data
-   */
-  private loadAllData(): void {
-    this.loadDomaines();
-    this.loadStructures();
-    this.loadProfils();
-  }
-
-  // ==================== DOMAINE METHODS ====================
-
-  /**
-   * Get all domaines
-   */
-  getDomaines(): Observable<Domaine[]> {
-    return this.http.get<Domaine[]>(`${this.apiUrl}/domaines`)
-      .pipe(
-        tap(data => this.domainesSubject.next(data))
-      );
-  }
-
-  /**
-   * Load domaines into state
-   */
   loadDomaines(): void {
     this.getDomaines().subscribe();
   }
 
-  /**
-   * Get domaine by ID
-   */
-  getDomaineById(id: number): Observable<Domaine> {
-    return this.http.get<Domaine>(`${this.apiUrl}/domaines/${id}`);
+  /** GET /api/reference/domaines/{id} */
+  getDomaineById(id: number): Observable<DomaineDTO> {
+    return this.http.get<DomaineDTO>(`${this.apiUrl}/domaines/${id}`);
   }
 
-  /**
-   * Create domaine
-   */
-  createDomaine(domaine: Domaine): Observable<Domaine> {
-    return this.http.post<Domaine>(`${this.apiUrl}/domaines`, domaine)
-      .pipe(
-        tap(newDomaine => {
-          const current = this.domainesSubject.value;
-          this.domainesSubject.next([...current, newDomaine]);
-        })
-      );
+  /** POST /api/reference/domaines */
+  createDomaine(domaine: DomaineDTO): Observable<DomaineDTO> {
+    return this.http.post<DomaineDTO>(`${this.apiUrl}/domaines`, domaine).pipe(
+      tap(created => {
+        this.domainesSubject.next([...this.domainesSubject.value, created]);
+      })
+    );
   }
 
-  /**
-   * Update domaine
-   */
-  updateDomaine(id: number, domaine: Domaine): Observable<Domaine> {
-    return this.http.put<Domaine>(`${this.apiUrl}/domaines/${id}`, domaine)
-      .pipe(
-        tap(updated => {
-          const current = this.domainesSubject.value;
-          const index = current.findIndex(d => d.id === id);
-          if (index !== -1) {
-            current[index] = updated;
-            this.domainesSubject.next([...current]);
-          }
-        })
-      );
+  /** PUT /api/reference/domaines/{id} */
+  updateDomaine(id: number, domaine: DomaineDTO): Observable<DomaineDTO> {
+    return this.http.put<DomaineDTO>(`${this.apiUrl}/domaines/${id}`, domaine).pipe(
+      tap(updated => {
+        const current = this.domainesSubject.value;
+        const idx = current.findIndex(d => d.id === id);
+        if (idx !== -1) {
+          const next = [...current];
+          next[idx] = updated;
+          this.domainesSubject.next(next);
+        }
+      })
+    );
   }
 
-  /**
-   * Delete domaine
-   */
+  /** DELETE /api/reference/domaines/{id} */
   deleteDomaine(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/domaines/${id}`)
-      .pipe(
-        tap(() => {
-          const current = this.domainesSubject.value;
-          this.domainesSubject.next(current.filter(d => d.id !== id));
-        })
-      );
+    return this.http.delete<void>(`${this.apiUrl}/domaines/${id}`).pipe(
+      tap(() => {
+        this.domainesSubject.next(
+          this.domainesSubject.value.filter(d => d.id !== id)
+        );
+      })
+    );
   }
 
-  // ==================== STRUCTURE METHODS ====================
-
-  /**
-   * Get all structures
-   */
-  getStructures(): Observable<Structure[]> {
-    return this.http.get<Structure[]>(`${this.apiUrl}/structures`)
-      .pipe(
-        tap(data => this.structuresSubject.next(data))
-      );
+  getCurrentDomaines(): DomaineDTO[] {
+    return this.domainesSubject.value;
   }
 
-  /**
-   * Load structures into state
-   */
+  // ==================== STRUCTURES ====================
+
+  /** GET /api/reference/structures */
+  getStructures(): Observable<StructureDTO[]> {
+    return this.http.get<StructureDTO[]>(`${this.apiUrl}/structures`).pipe(
+      tap(data => this.structuresSubject.next(data)),
+      catchError(error => {
+        console.error('Error loading structures:', error);
+        return of([]);
+      })
+    );
+  }
+
   loadStructures(): void {
     this.getStructures().subscribe();
   }
 
-  /**
-   * Get structure by ID
-   */
-  getStructureById(id: number): Observable<Structure> {
-    return this.http.get<Structure>(`${this.apiUrl}/structures/${id}`);
+  /** GET /api/reference/structures/{id} */
+  getStructureById(id: number): Observable<StructureDTO> {
+    return this.http.get<StructureDTO>(`${this.apiUrl}/structures/${id}`);
   }
 
-  /**
-   * Create structure
-   */
-  createStructure(structure: Structure): Observable<Structure> {
-    return this.http.post<Structure>(`${this.apiUrl}/structures`, structure)
-      .pipe(
-        tap(newStructure => {
-          const current = this.structuresSubject.value;
-          this.structuresSubject.next([...current, newStructure]);
-        })
-      );
+  /** POST /api/reference/structures */
+  createStructure(structure: StructureDTO): Observable<StructureDTO> {
+    return this.http.post<StructureDTO>(`${this.apiUrl}/structures`, structure).pipe(
+      tap(created => {
+        this.structuresSubject.next([...this.structuresSubject.value, created]);
+      })
+    );
   }
 
-  /**
-   * Update structure
-   */
-  updateStructure(id: number, structure: Structure): Observable<Structure> {
-    return this.http.put<Structure>(`${this.apiUrl}/structures/${id}`, structure)
-      .pipe(
-        tap(updated => {
-          const current = this.structuresSubject.value;
-          const index = current.findIndex(s => s.id === id);
-          if (index !== -1) {
-            current[index] = updated;
-            this.structuresSubject.next([...current]);
-          }
-        })
-      );
+  /** PUT /api/reference/structures/{id} */
+  updateStructure(id: number, structure: StructureDTO): Observable<StructureDTO> {
+    return this.http.put<StructureDTO>(`${this.apiUrl}/structures/${id}`, structure).pipe(
+      tap(updated => {
+        const current = this.structuresSubject.value;
+        const idx = current.findIndex(s => s.id === id);
+        if (idx !== -1) {
+          const next = [...current];
+          next[idx] = updated;
+          this.structuresSubject.next(next);
+        }
+      })
+    );
   }
 
-  /**
-   * Delete structure
-   */
+  /** DELETE /api/reference/structures/{id} */
   deleteStructure(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/structures/${id}`)
-      .pipe(
-        tap(() => {
-          const current = this.structuresSubject.value;
-          this.structuresSubject.next(current.filter(s => s.id !== id));
-        })
-      );
+    return this.http.delete<void>(`${this.apiUrl}/structures/${id}`).pipe(
+      tap(() => {
+        this.structuresSubject.next(
+          this.structuresSubject.value.filter(s => s.id !== id)
+        );
+      })
+    );
   }
 
-  // ==================== PROFIL METHODS ====================
-
-  /**
-   * Get all profils
-   */
-  getProfils(): Observable<Profil[]> {
-    return this.http.get<Profil[]>(`${this.apiUrl}/profils`)
-      .pipe(
-        tap(data => this.profilsSubject.next(data))
-      );
+  getCurrentStructures(): StructureDTO[] {
+    return this.structuresSubject.value;
   }
 
-  /**
-   * Load profils into state
-   */
+  // ==================== PROFILS ====================
+
+  /** GET /api/reference/profils */
+  getProfils(): Observable<ProfilDTO[]> {
+    return this.http.get<ProfilDTO[]>(`${this.apiUrl}/profils`).pipe(
+      tap(data => this.profilsSubject.next(data)),
+      catchError(error => {
+        console.error('Error loading profils:', error);
+        return of([]);
+      })
+    );
+  }
+
   loadProfils(): void {
     this.getProfils().subscribe();
   }
 
-  /**
-   * Get profil by ID
-   */
-  getProfilById(id: number): Observable<Profil> {
-    return this.http.get<Profil>(`${this.apiUrl}/profils/${id}`);
+  /** GET /api/reference/profils/{id} */
+  getProfilById(id: number): Observable<ProfilDTO> {
+    return this.http.get<ProfilDTO>(`${this.apiUrl}/profils/${id}`);
   }
 
-  /**
-   * Create profil
-   */
-  createProfil(profil: Profil): Observable<Profil> {
-    return this.http.post<Profil>(`${this.apiUrl}/profils`, profil)
-      .pipe(
-        tap(newProfil => {
-          const current = this.profilsSubject.value;
-          this.profilsSubject.next([...current, newProfil]);
-        })
-      );
+  /** POST /api/reference/profils */
+  createProfil(profil: ProfilDTO): Observable<ProfilDTO> {
+    return this.http.post<ProfilDTO>(`${this.apiUrl}/profils`, profil).pipe(
+      tap(created => {
+        this.profilsSubject.next([...this.profilsSubject.value, created]);
+      })
+    );
   }
 
-  /**
-   * Update profil
-   */
-  updateProfil(id: number, profil: Profil): Observable<Profil> {
-    return this.http.put<Profil>(`${this.apiUrl}/profils/${id}`, profil)
-      .pipe(
-        tap(updated => {
-          const current = this.profilsSubject.value;
-          const index = current.findIndex(p => p.id === id);
-          if (index !== -1) {
-            current[index] = updated;
-            this.profilsSubject.next([...current]);
-          }
-        })
-      );
+  /** PUT /api/reference/profils/{id} */
+  updateProfil(id: number, profil: ProfilDTO): Observable<ProfilDTO> {
+    return this.http.put<ProfilDTO>(`${this.apiUrl}/profils/${id}`, profil).pipe(
+      tap(updated => {
+        const current = this.profilsSubject.value;
+        const idx = current.findIndex(p => p.id === id);
+        if (idx !== -1) {
+          const next = [...current];
+          next[idx] = updated;
+          this.profilsSubject.next(next);
+        }
+      })
+    );
   }
 
-  /**
-   * Delete profil
-   */
+  /** DELETE /api/reference/profils/{id} */
   deleteProfil(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/profils/${id}`)
-      .pipe(
-        tap(() => {
-          const current = this.profilsSubject.value;
-          this.profilsSubject.next(current.filter(p => p.id !== id));
-        })
-      );
+    return this.http.delete<void>(`${this.apiUrl}/profils/${id}`).pipe(
+      tap(() => {
+        this.profilsSubject.next(
+          this.profilsSubject.value.filter(p => p.id !== id)
+        );
+      })
+    );
   }
 
-  /**
-   * Get current domaines state
-   */
-  getCurrentDomaines(): Domaine[] {
-    return this.domainesSubject.value;
-  }
-
-  /**
-   * Get current structures state
-   */
-  getCurrentStructures(): Structure[] {
-    return this.structuresSubject.value;
-  }
-
-  /**
-   * Get current profils state
-   */
-  getCurrentProfils(): Profil[] {
+  getCurrentProfils(): ProfilDTO[] {
     return this.profilsSubject.value;
+  }
+
+  // ==================== EMPLOYEURS ====================
+
+  /** GET /api/reference/employeurs */
+  getEmployeurs(): Observable<EmployeurDTO[]> {
+    return this.http.get<EmployeurDTO[]>(`${this.apiUrl}/employeurs`).pipe(
+      tap(data => this.employeursSubject.next(data)),
+      catchError(error => {
+        console.error('Error loading employeurs:', error);
+        return of([]);
+      })
+    );
+  }
+
+  loadEmployeurs(): void {
+    this.getEmployeurs().subscribe();
+  }
+
+  /** GET /api/reference/employeurs/{id} */
+  getEmployeurById(id: number): Observable<EmployeurDTO> {
+    return this.http.get<EmployeurDTO>(`${this.apiUrl}/employeurs/${id}`);
+  }
+
+  /** POST /api/reference/employeurs */
+  createEmployeur(employeur: EmployeurDTO): Observable<EmployeurDTO> {
+    return this.http.post<EmployeurDTO>(`${this.apiUrl}/employeurs`, employeur).pipe(
+      tap(created => {
+        this.employeursSubject.next([...this.employeursSubject.value, created]);
+      })
+    );
+  }
+
+  /** PUT /api/reference/employeurs/{id} */
+  updateEmployeur(id: number, employeur: EmployeurDTO): Observable<EmployeurDTO> {
+    return this.http.put<EmployeurDTO>(`${this.apiUrl}/employeurs/${id}`, employeur).pipe(
+      tap(updated => {
+        const current = this.employeursSubject.value;
+        const idx = current.findIndex(e => e.id === id);
+        if (idx !== -1) {
+          const next = [...current];
+          next[idx] = updated;
+          this.employeursSubject.next(next);
+        }
+      })
+    );
+  }
+
+  /** DELETE /api/reference/employeurs/{id} */
+  deleteEmployeur(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/employeurs/${id}`).pipe(
+      tap(() => {
+        this.employeursSubject.next(
+          this.employeursSubject.value.filter(e => e.id !== id)
+        );
+      })
+    );
+  }
+
+  getCurrentEmployeurs(): EmployeurDTO[] {
+    return this.employeursSubject.value;
+  }
+
+  // ==================== UTILITY ====================
+
+  loadAllReferenceData(): void {
+    this.loadDomaines();
+    this.loadStructures();
+    this.loadProfils();
+    this.loadEmployeurs();
   }
 }

@@ -19,4 +19,5 @@ export const settings: MenuItem[] = [
         route: '/admin/profiles',
         roles: ['ADMINISTRATEUR']
       },
+      
     ];
