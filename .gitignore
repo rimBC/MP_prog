@@ -24,11 +24,11 @@ FrontAngular/yarn-error.log*
 # Backend (Bakend_MP)
 # (assuming Java / Spring Boot)
 # ======================
-Bakend_MP/target/
-Bakend_MP/*.log
+Backend_MP/target/
+Backend_MP/*.log
 
 # If using Maven wrapper
-Bakend_MP/.mvn/wrapper/maven-wrapper.jar
+Backend_MP/.mvn/wrapper/maven-wrapper.jar
 
 # ======================
 # OS files
