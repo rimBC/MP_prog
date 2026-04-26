@@ -1,1 +1,43 @@
+# ======================
+# IDE
+# ======================
 .idea/
+.vscode/
+*.iml
+
+# ======================
+# Angular (FrontAngular)
+# ======================
+FrontAngular/node_modules/
+FrontAngular/dist/
+FrontAngular/.angular/
+FrontAngular/.cache/
+FrontAngular/.eslintcache
+FrontAngular/coverage/
+
+# Logs
+FrontAngular/npm-debug.log*
+FrontAngular/yarn-debug.log*
+FrontAngular/yarn-error.log*
+
+# ======================
+# Backend (Bakend_MP)
+# (assuming Java / Spring Boot)
+# ======================
+Bakend_MP/target/
+Bakend_MP/*.log
+
+# If using Maven wrapper
+Bakend_MP/.mvn/wrapper/maven-wrapper.jar
+
+# ======================
+# OS files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Environment files
+# ======================
+.env
+.env.*
