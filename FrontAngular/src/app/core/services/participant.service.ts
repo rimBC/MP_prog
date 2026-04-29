@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { ParticipantDTO } from '../../models/participant.interface';
 import { StructureDTO } from '../../models/structure.interface';
@@ -19,14 +19,14 @@ export class ParticipantService {
   private structuresUrl = 'http://localhost:8080/api/reference/structures';
   private profilsUrl = 'http://localhost:8080/api/reference/profils';
 
-  private participantsSubject = new BehaviorSubject<ParticipantDTO[]>([]);
-  public participants$ = this.participantsSubject.asObservable();
+  private _participants = signal<ParticipantDTO[]>([]);
+  readonly participants = this._participants.asReadonly();
 
-  private structuresSubject = new BehaviorSubject<StructureDTO[]>([]);
-  public structures$ = this.structuresSubject.asObservable();
+  private _structures = signal<StructureDTO[]>([]);
+  readonly structures = this._structures.asReadonly();
 
-  private profilsSubject = new BehaviorSubject<ProfilDTO[]>([]);
-  public profils$ = this.profilsSubject.asObservable();
+  private _profils = signal<ProfilDTO[]>([]);
+  readonly profils = this._profils.asReadonly();
 
   constructor(private http: HttpClient) { }
 
@@ -35,7 +35,7 @@ export class ParticipantService {
   /** GET /api/participants */
   getParticipants(): Observable<ParticipantDTO[]> {
     return this.http.get<ParticipantDTO[]>(this.apiUrl).pipe(
-      tap(data => this.participantsSubject.next(data)),
+      tap(data => this._participants.set(data)),
       catchError(error => {
         console.error('Error loading participants:', error);
         return of([]);
@@ -56,7 +56,7 @@ export class ParticipantService {
   createParticipant(participant: ParticipantDTO): Observable<ParticipantDTO> {
     return this.http.post<ParticipantDTO>(this.apiUrl, participant).pipe(
       tap(created => {
-        this.participantsSubject.next([...this.participantsSubject.value, created]);
+        this._participants.update(current => [...current, created]);
       })
     );
   }
@@ -65,13 +65,13 @@ export class ParticipantService {
   updateParticipant(id: number, participant: ParticipantDTO): Observable<ParticipantDTO> {
     return this.http.put<ParticipantDTO>(`${this.apiUrl}/${id}`, participant).pipe(
       tap(updated => {
-        const current = this.participantsSubject.value;
-        const idx = current.findIndex(p => p.id === id);
-        if (idx !== -1) {
+        this._participants.update(current => {
+          const idx = current.findIndex(p => p.id === id);
+          if (idx === -1) return current;
           const next = [...current];
           next[idx] = updated;
-          this.participantsSubject.next(next);
-        }
+          return next;
+        });
       })
     );
   }
@@ -80,9 +80,7 @@ export class ParticipantService {
   deleteParticipant(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
-        this.participantsSubject.next(
-          this.participantsSubject.value.filter(p => p.id !== id)
-        );
+        this._participants.update(current => current.filter(p => p.id !== id));
       })
     );
   }
@@ -127,7 +125,7 @@ export class ParticipantService {
   }
 
   getCurrentParticipants(): ParticipantDTO[] {
-    return this.participantsSubject.value;
+    return this._participants();
   }
 
   // ==================== STRUCTURES ====================
@@ -135,7 +133,7 @@ export class ParticipantService {
   /** GET /api/reference/structures */
   getStructures(): Observable<StructureDTO[]> {
     return this.http.get<StructureDTO[]>(this.structuresUrl).pipe(
-      tap(data => this.structuresSubject.next(data)),
+      tap(data => this._structures.set(data)),
       catchError(error => {
         console.error('Error loading structures:', error);
         return of([]);
@@ -148,7 +146,7 @@ export class ParticipantService {
   }
 
   getCurrentStructures(): StructureDTO[] {
-    return this.structuresSubject.value;
+    return this._structures();
   }
 
   // ==================== PROFILS ====================
@@ -156,7 +154,7 @@ export class ParticipantService {
   /** GET /api/reference/profils */
   getProfils(): Observable<ProfilDTO[]> {
     return this.http.get<ProfilDTO[]>(this.profilsUrl).pipe(
-      tap(data => this.profilsSubject.next(data)),
+      tap(data => this._profils.set(data)),
       catchError(error => {
         console.error('Error loading profils:', error);
         return of([]);
@@ -169,16 +167,16 @@ export class ParticipantService {
   }
 
   getCurrentProfils(): ProfilDTO[] {
-    return this.profilsSubject.value;
+    return this._profils();
   }
 
   private replaceInState(updated: ParticipantDTO): void {
-    const current = this.participantsSubject.value;
-    const idx = current.findIndex(p => p.id === updated.id);
-    if (idx !== -1) {
+    this._participants.update(current => {
+      const idx = current.findIndex(p => p.id === updated.id);
+      if (idx === -1) return current;
       const next = [...current];
       next[idx] = updated;
-      this.participantsSubject.next(next);
-    }
+      return next;
+    });
   }
 }

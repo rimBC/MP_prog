@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { UtilisateurDTO } from '../../models/user.interface';
 
@@ -16,11 +16,11 @@ export class UserService {
 
   private apiUrl = 'http://localhost:8080/api/utilisateurs';
 
-  private utilisateursSubject = new BehaviorSubject<UtilisateurDTO[]>([]);
-  public utilisateurs$ = this.utilisateursSubject.asObservable();
+  private _utilisateurs = signal<UtilisateurDTO[]>([]);
+  readonly utilisateurs = this._utilisateurs.asReadonly();
 
-  private rolesSubject = new BehaviorSubject<Role[]>([]);
-  public roles$ = this.rolesSubject.asObservable();
+  private _roles = signal<Role[]>([]);
+  readonly roles = this._roles.asReadonly();
 
   // Backend has no roles endpoint — keep these as the canonical roles known by the backend.
   private staticRoles: Role[] = [
@@ -30,13 +30,13 @@ export class UserService {
   ];
 
   constructor(private http: HttpClient) {
-    this.rolesSubject.next([...this.staticRoles]);
+    this._roles.set([...this.staticRoles]);
   }
 
   // ==================== ROLES ====================
 
   getRoles(): Observable<Role[]> {
-    this.rolesSubject.next([...this.staticRoles]);
+    this._roles.set([...this.staticRoles]);
     return of([...this.staticRoles]);
   }
 
@@ -45,7 +45,7 @@ export class UserService {
   }
 
   getCurrentRoles(): Role[] {
-    return this.rolesSubject.value;
+    return this._roles();
   }
 
   // ==================== UTILISATEURS ====================
@@ -53,7 +53,7 @@ export class UserService {
   /** GET /api/utilisateurs */
   getUtilisateurs(): Observable<UtilisateurDTO[]> {
     return this.http.get<UtilisateurDTO[]>(this.apiUrl).pipe(
-      tap(data => this.utilisateursSubject.next(data)),
+      tap(data => this._utilisateurs.set(data)),
       catchError(error => {
         console.error('Error loading users:', error);
         return of([]);
@@ -120,8 +120,7 @@ export class UserService {
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${userId}`).pipe(
       tap(() => {
-        const current = this.utilisateursSubject.value;
-        this.utilisateursSubject.next(current.filter(u => u.id !== userId));
+        this._utilisateurs.update(current => current.filter(u => u.id !== userId));
       })
     );
   }
@@ -135,16 +134,16 @@ export class UserService {
   }
 
   getCurrentUtilisateurs(): UtilisateurDTO[] {
-    return this.utilisateursSubject.value;
+    return this._utilisateurs();
   }
 
   private replaceInState(updated: UtilisateurDTO): void {
-    const current = this.utilisateursSubject.value;
-    const index = current.findIndex(u => u.id === updated.id);
-    if (index !== -1) {
+    this._utilisateurs.update(current => {
+      const index = current.findIndex(u => u.id === updated.id);
+      if (index === -1) return current;
       const next = [...current];
       next[index] = updated;
-      this.utilisateursSubject.next(next);
-    }
+      return next;
+    });
   }
 }

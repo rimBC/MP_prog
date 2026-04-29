@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6 bg-base text-primary">
+<div class="xl:mx-10 xl:mt-6 mx-auto p-6 bg-base text-primary">
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
@@ -91,7 +91,7 @@
         <p class="text-sec">Try adjusting your filters or create a new formation</p>
     </div>
     } @else {
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         @for (formation of filteredFormations(); track formation.id) {
         <app-formation-card
             [formation]="formation"

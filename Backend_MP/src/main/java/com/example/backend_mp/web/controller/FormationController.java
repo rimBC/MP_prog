@@ -36,6 +36,10 @@ public class FormationController {
     @Operation(summary = "Get all formations", description = "Retrieve all training sessions")
     public ResponseEntity<List<FormationDTO>> getAllFormations() {
         log.info("Fetching all formations");
+        log.info("Fetching all formations");
+        log.info("Fetching all formations");
+        log.info("Fetching all formations");
+        log.info("Fetching all formations");
         return ResponseEntity.ok(formationService.getAllFormations());
     }
     

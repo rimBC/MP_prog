@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { FormateurDTO } from '../../models/formateur.interface';
 import { EmployeurDTO } from '../../models/employeur.interface';
@@ -16,11 +16,11 @@ export class FormateurService {
   private apiUrl = 'http://localhost:8080/api/formateurs';
   private employeursUrl = 'http://localhost:8080/api/reference/employeurs';
 
-  private formateursSubject = new BehaviorSubject<FormateurDTO[]>([]);
-  public formateurs$ = this.formateursSubject.asObservable();
+  private _formateurs = signal<FormateurDTO[]>([]);
+  readonly formateurs = this._formateurs.asReadonly();
 
-  private employeursSubject = new BehaviorSubject<EmployeurDTO[]>([]);
-  public employeurs$ = this.employeursSubject.asObservable();
+  private _employeurs = signal<EmployeurDTO[]>([]);
+  readonly employeurs = this._employeurs.asReadonly();
 
   constructor(private http: HttpClient) { }
 
@@ -29,7 +29,7 @@ export class FormateurService {
   /** GET /api/formateurs */
   getFormateurs(): Observable<FormateurDTO[]> {
     return this.http.get<FormateurDTO[]>(this.apiUrl).pipe(
-      tap(data => this.formateursSubject.next(data)),
+      tap(data => this._formateurs.set(data)),
       catchError(error => {
         console.error('Error loading formateurs:', error);
         return of([]);
@@ -50,7 +50,7 @@ export class FormateurService {
   createFormateur(formateur: FormateurDTO): Observable<FormateurDTO> {
     return this.http.post<FormateurDTO>(this.apiUrl, formateur).pipe(
       tap(created => {
-        this.formateursSubject.next([...this.formateursSubject.value, created]);
+        this._formateurs.update(current => [...current, created]);
       })
     );
   }
@@ -59,13 +59,13 @@ export class FormateurService {
   updateFormateur(id: number, formateur: FormateurDTO): Observable<FormateurDTO> {
     return this.http.put<FormateurDTO>(`${this.apiUrl}/${id}`, formateur).pipe(
       tap(updated => {
-        const current = this.formateursSubject.value;
-        const idx = current.findIndex(f => f.id === id);
-        if (idx !== -1) {
+        this._formateurs.update(current => {
+          const idx = current.findIndex(f => f.id === id);
+          if (idx === -1) return current;
           const next = [...current];
           next[idx] = updated;
-          this.formateursSubject.next(next);
-        }
+          return next;
+        });
       })
     );
   }
@@ -74,9 +74,7 @@ export class FormateurService {
   deleteFormateur(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
-        this.formateursSubject.next(
-          this.formateursSubject.value.filter(f => f.id !== id)
-        );
+        this._formateurs.update(current => current.filter(f => f.id !== id));
       })
     );
   }
@@ -95,7 +93,7 @@ export class FormateurService {
   }
 
   getCurrentFormateurs(): FormateurDTO[] {
-    return this.formateursSubject.value;
+    return this._formateurs();
   }
 
   // ==================== EMPLOYEURS ====================
@@ -104,7 +102,7 @@ export class FormateurService {
   /** GET /api/reference/employeurs */
   getEmployeurs(): Observable<EmployeurDTO[]> {
     return this.http.get<EmployeurDTO[]>(this.employeursUrl).pipe(
-      tap(data => this.employeursSubject.next(data)),
+      tap(data => this._employeurs.set(data)),
       catchError(error => {
         console.error('Error loading employeurs:', error);
         return of([]);
@@ -117,6 +115,6 @@ export class FormateurService {
   }
 
   getCurrentEmployeurs(): EmployeurDTO[] {
-    return this.employeursSubject.value;
+    return this._employeurs();
   }
 }

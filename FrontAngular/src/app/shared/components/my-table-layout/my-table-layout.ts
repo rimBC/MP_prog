@@ -13,6 +13,7 @@ export class MyTableLayout implements OnInit{
   @Input() ListName  : string =""
   @Input() Name  : string ="Item"
   @Input() Total  : string =""
+  @Input() showPagination : boolean = true
 
 
   @Output() searchClicked = new EventEmitter<string>();

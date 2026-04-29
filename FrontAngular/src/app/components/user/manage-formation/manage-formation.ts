@@ -1,6 +1,5 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormationDTO } from '../../../models/formationDTO.interface';
-import { FormateurDTO } from '../../../models/formateur.interface';
 import { DomaineDTO } from '../../../models/domaine.interface';
 import { FormsModule } from '@angular/forms';
 import { FormationService } from '../../../core/services/formation.service';
@@ -19,9 +18,13 @@ import { FormationModal } from './formation-modal/formation-modal';
 })
 export class ManageFormation implements OnInit, OnDestroy {
 
-  formations = signal<FormationDTO[]>([]);
-  domaines = signal<DomaineDTO[]>([]);
-  formateurs = signal<FormateurDTO[]>([]);
+  private formationService = inject(FormationService);
+  private formateurService = inject(FormateurService);
+  private referenceDataService = inject(ReferenceDataService);
+
+  readonly formations = this.formationService.formations;
+  readonly formateurs = this.formateurService.formateurs;
+  readonly domaines = signal<DomaineDTO[]>([]);
 
   filterStatus = signal('ALL');
   filterDomain = signal('ALL');
@@ -37,11 +40,13 @@ export class ManageFormation implements OnInit, OnDestroy {
   success: string | null = null;
 
   filteredFormations = computed(() => {
+    console.log('this is accessed')
     const formations = this.formations();
     const status = this.filterStatus();
     const domain = this.filterDomain();
     const year = this.filterYear();
     const search = this.searchText().toLowerCase();
+    console.log(formations)
 
     return formations.filter(formation => {
       if (status !== 'ALL' && formation.statut !== status) return false;
@@ -67,37 +72,19 @@ export class ManageFormation implements OnInit, OnDestroy {
     { value: 'ANNULEA', label: 'Cancelled' }
   ];
 
-  constructor(
-    private formationService: FormationService,
-    private formateurService: FormateurService,
-    private referenceDataService: ReferenceDataService
-  ) {}
-
   ngOnInit(): void {
-    this.loadData();
+    this.referenceDataService.domaines$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(domaines => this.domaines.set(domaines));
+
+    this.formationService.loadFormations();
+    this.referenceDataService.loadDomaines();
+    this.formateurService.loadFormateurs();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private loadData(): void {
-    this.formationService.formations$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(formations => this.formations.set(formations));
-
-    this.referenceDataService.domaines$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(domaines => this.domaines.set(domaines));
-
-    this.formateurService.formateurs$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(formateurs => this.formateurs.set(formateurs));
-
-    this.formationService.loadFormations();
-    this.referenceDataService.loadDomaines();
-    this.formateurService.loadFormateurs();
   }
 
   openCreateModal(): void {

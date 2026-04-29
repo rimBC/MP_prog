@@ -47,6 +47,33 @@
             --text-btn-primary: #e8e8e8;
             --color-border: #cbccce;
             --text-btn-outline: #2e578a;
+
+            /* =========================
+               STATS COLORS - LIGHT
+            ========================= */
+                --stats-color-1-bg: #cfe4fd;
+                    --stats-color-1-text: #074a92;
+                
+                    --stats-color-2-bg: #c9f2dc;
+                    --stats-color-2-text: #1f7a5a;
+                
+                    --stats-color-3-bg: #ffe0b3;
+                    --stats-color-3-text: #b26b00;
+                
+                    --stats-color-4-bg: #f9caca;
+                    --stats-color-4-text: #b42318;
+                
+                    --stats-color-5-bg: #e9d5ff;
+                    --stats-color-5-text: #6b21a8;
+                
+                    --stats-color-6-bg: #bfe6fb;
+                    --stats-color-6-text: #075985;
+                
+                    --stats-color-7-bg: #c8f7d8;
+                    --stats-color-7-text: #166534;
+                
+                    --stats-color-8-bg: #ffe1c2;
+                    --stats-color-8-text: #c2410c;
 }
 
 /* =========================
@@ -95,6 +122,34 @@
     --color-primary-700: #9ecafa;
     --color-primary-800: #cee5fd;
     --color-primary-900: #e7f2fe;
+
+    /* =========================
+       STATS COLORS - DARK (lighter BG)
+    ========================= */
+
+    --stats-color-1-bg: #366390;
+    --stats-color-1-text: #9ecafa;
+
+    --stats-color-2-bg: #164734;
+    --stats-color-2-text: #6ee7b7;
+
+    --stats-color-3-bg: #5a440b;
+    --stats-color-3-text: #facc15;
+
+    --stats-color-4-bg: #a94242;
+    --stats-color-4-text: #f87171;
+
+    --stats-color-5-bg: #3b1a85;
+    --stats-color-5-text: #c4b5fd;
+
+    --stats-color-6-bg: #0e3f5a;
+    --stats-color-6-text: #7dd3fc;
+
+    --stats-color-7-bg: #0b3f1f;
+    --stats-color-7-text: #86efac;
+
+    --stats-color-8-bg: #5a2a0b;
+    --stats-color-8-text: #fdba74;
 }
 
 @layer components {
@@ -202,7 +257,117 @@
         .myBorder {
             border-color: var(--color-border);
         }
+                /* BG */
+                .bg-stats-1 {
+                    background-color: var(--stats-color-1-bg);
+                }
         
+                .bg-stats-2 {
+                    background-color: var(--stats-color-2-bg);
+                }
+        
+                .bg-stats-3 {
+                    background-color: var(--stats-color-3-bg);
+                }
+        
+                .bg-stats-4 {
+                    background-color: var(--stats-color-4-bg);
+                }
+        
+                .bg-stats-5 {
+                    background-color: var(--stats-color-5-bg);
+                }
+        
+                .bg-stats-6 {
+                    background-color: var(--stats-color-6-bg);
+                }
+        
+                .bg-stats-7 {
+                    background-color: var(--stats-color-7-bg);
+                }
+        
+                .bg-stats-8 {
+                    background-color: var(--stats-color-8-bg);
+                }
+        
+                /* TEXT */
+                .text-stats-1 {
+                    color: var(--stats-color-1-text);
+                }
+        
+                .text-stats-2 {
+                    color: var(--stats-color-2-text);
+                }
+        
+                .text-stats-3 {
+                    color: var(--stats-color-3-text);
+                }
+        
+                .text-stats-4 {
+                    color: var(--stats-color-4-text);
+                }
+        
+                .text-stats-5 {
+                    color: var(--stats-color-5-text);
+                }
+        
+                .text-stats-6 {
+                    color: var(--stats-color-6-text);
+                }
+        
+                .text-stats-7 {
+                    color: var(--stats-color-7-text);
+                }
+        
+                .text-stats-8 {
+                    color: var(--stats-color-8-text);
+                }
+                
+        
+
+                                /* =========================
+                   SOLID STATS BACKGROUNDS
+                ========================= */
+                
+                                .bg-stats-solid-1 {
+                                    background-color: var(--stats-color-1-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-2 {
+                                    background-color: var(--stats-color-2-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-3 {
+                                    background-color: var(--stats-color-3-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-4 {
+                                    background-color: var(--stats-color-4-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-5 {
+                                    background-color: var(--stats-color-5-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-6 {
+                                    background-color: var(--stats-color-6-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-7 {
+                                    background-color: var(--stats-color-7-text);
+                                    color: #ffffff;
+                                }
+                
+                                .bg-stats-solid-8 {
+                                    background-color: var(--stats-color-8-text);
+                                    color: #ffffff;
+                                }
 }
 
 /* Global Styles

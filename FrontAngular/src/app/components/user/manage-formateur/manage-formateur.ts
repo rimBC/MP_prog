@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Employeur, FormateurDTO, FormateurService } from '../../../core/services/formateurs.service';
 import { FormateurCard } from './formateur-card/formateur-card';
 import { CommonModule } from '@angular/common';
@@ -13,8 +13,10 @@ import { FormateurModal } from './formateur-modal/formateur-modal';
 })
 export class ManageFormateur implements OnInit {
 
-  formateurs: FormateurDTO[] = [];
-  employeurs: Employeur[] = [];
+  private formateurService = inject(FormateurService);
+
+  readonly formateurs = this.formateurService.formateurs;
+  readonly employeurs = this.formateurService.employeurs;
 
   loading = false;
   error: string | null = null;
@@ -25,43 +27,26 @@ export class ManageFormateur implements OnInit {
   editingFormateur: FormateurDTO | null = null;
 
   // Filters
-  filterType = 'ALL';
-  searchText = '';
+  readonly filterType = signal('ALL');
+  readonly searchText = signal('');
 
-  constructor(private formateurService: FormateurService) { }
-
-  ngOnInit(): void {
-    this.loadData();
-  }
-
-  private loadData(): void {
-    this.formateurService.formateurs$.subscribe(formateurs => {
-      this.formateurs = formateurs;
-    });
-
-    this.formateurService.employeurs$.subscribe(employeurs => {
-      this.employeurs = employeurs;
-    });
-
-    this.formateurService.loadFormateurs();
-    this.formateurService.loadEmployeurs();
-  }
-
-  getFilteredFormateurs(): FormateurDTO[] {
-    return this.formateurs.filter(formateur => {
-      if (this.filterType !== 'ALL' && formateur.type !== this.filterType) {
-        return false;
+  readonly filteredFormateurs = computed<FormateurDTO[]>(() => {
+    const type = this.filterType();
+    const search = this.searchText().toLowerCase();
+    return this.formateurs().filter(formateur => {
+      if (type !== 'ALL' && formateur.type !== type) return false;
+      if (search) {
+        return `${formateur.prenom} ${formateur.nom}`.toLowerCase().includes(search) ||
+               (formateur.email?.toLowerCase().includes(search) ?? false) ||
+               (formateur.specialite?.toLowerCase().includes(search) ?? false);
       }
-
-      if (this.searchText) {
-        const searchLower = this.searchText.toLowerCase();
-        return `${formateur.prenom} ${formateur.nom}`.toLowerCase().includes(searchLower) ||
-               (formateur.email?.toLowerCase().includes(searchLower) ?? false) ||
-               (formateur.specialite?.toLowerCase().includes(searchLower) ?? false);
-      }
-
       return true;
     });
+  });
+
+  ngOnInit(): void {
+    this.formateurService.loadFormateurs();
+    this.formateurService.loadEmployeurs();
   }
 
   openCreateModal(): void {
@@ -134,13 +119,13 @@ export class ManageFormateur implements OnInit {
   }
 
   resetFilters(): void {
-    this.filterType = 'ALL';
-    this.searchText = '';
+    this.filterType.set('ALL');
+    this.searchText.set('');
   }
 
   getEmployeurName(employeurId?: number): string {
     if (!employeurId) return 'In-House';
-    const employeur = this.employeurs.find(e => e.id === employeurId);
+    const employeur = this.employeurs().find(e => e.id === employeurId);
     return employeur?.nomEmployeur || 'Unknown';
   }
 }

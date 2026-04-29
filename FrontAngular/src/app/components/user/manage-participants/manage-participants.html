@@ -33,7 +33,7 @@
         <div class="flex flex-col min-w-40">
             <h2 class="text-xl font-bold text-primary">Filters</h2>
             <p class="text-sec text-sm">
-                Showing {{ getFilteredParticipants().length }} of {{ participants.length }} participants
+                Showing {{ filteredParticipants().length }} of {{ participants().length }} participants
             </p>
         </div>
 
@@ -41,23 +41,26 @@
         <div class="flex flex-wrap items-center gap-3">
         
             <!-- Department -->
-            <select [(ngModel)]="filterStructure" class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
+            <select [ngModel]="filterStructure()" (ngModelChange)="filterStructure.set($event)"
+                class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
                 <option value="ALL">All Departments</option>
-                @for (structure of structures; track structure.id) {
+                @for (structure of structures(); track structure.id) {
                 <option [value]="structure.id">{{ structure.libelle }}</option>
                 }
             </select>
 
             <!-- Job Profile -->
-            <select [(ngModel)]="filterProfil" class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
+            <select [ngModel]="filterProfil()" (ngModelChange)="filterProfil.set($event)"
+                class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
                 <option value="ALL">All Profiles</option>
-                @for (profil of profils; track profil.id) {
+                @for (profil of profils(); track profil.id) {
                 <option [value]="profil.id">{{ profil.libelle }}</option>
                 }
             </select>
 
             <!-- Status -->
-            <select [(ngModel)]="filterStatus" class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
+            <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)"
+                class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
                 <option value="ALL">All Status</option>
                 <option value="ACTIVE">Active</option>
                 <option value="INACTIVE">Inactive</option>
@@ -78,7 +81,7 @@
             ========================== -->
 <div class="block lg:hidden space-y-4">
 
-    @for (participant of getFilteredParticipants(); track participant) {
+    @for (participant of filteredParticipants(); track participant) {
 
     <div class="bg-sec rounded-lg shadow p-4 border myBorder">
 
@@ -139,7 +142,7 @@
 </div>
     <!-- Participants Table -->
     <app-my-table-layout class="hidden lg:block" ListName="Participants" Name="Participant" 
-    [Total]="getFilteredParticipants().length.toString()"
+    [Total]="filteredParticipants().length.toString()"
     (searchClicked)="($event)"
     (addClicked)="openCreateModal()"
     (exportClicked)="openCreateModal()">
@@ -148,7 +151,7 @@
             <!-- =========================
                  ❌ EMPTY STATE
             ========================== -->
-            @if (getFilteredParticipants().length === 0) {
+            @if (filteredParticipants().length === 0) {
             <div class="bg-sec shadow-lg p-8 text-center text-sec">
                 <p class="text-lg mb-2">No participants found</p>
                 <p class="text-sm">Try adjusting your filters or add a new participant</p>
@@ -178,7 +181,7 @@
         
                     <tbody>
         
-                        @for (participant of getFilteredParticipants(); track participant) {
+                        @for (participant of filteredParticipants(); track participant) {
         
                         <tr class="border-b myBorder hover:bg-base transition">
         
@@ -294,8 +297,8 @@
     <!-- Add/Edit Modal -->
     <app-participant-modal
         [isOpen]="modalOpen"
-        [structures]="structures"
-        [profils]="profils"
+        [structures]="structures()"
+        [profils]="profils()"
         [participant]="editingParticipant"
         [loading]="loading"
         (closed)="closeModal()"

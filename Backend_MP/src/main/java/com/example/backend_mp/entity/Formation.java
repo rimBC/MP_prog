@@ -1,5 +1,7 @@
 package com.example.backend_mp.entity;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,19 +13,22 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Formation entity representing training sessions
  */
 @Entity
 @Table(name = "formation")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Formation {
     
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
@@ -73,16 +78,11 @@ public class Formation {
 //    )
 //    @Builder.Default
 //    private Set<Participant> participants = new HashSet<>();
-
-    @OneToMany(mappedBy = "formation", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "formation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private Set<ParticipantFormation> participantFormations = new HashSet<>();
 
-    public Set<Participant> getParticipants() {
-        return participantFormations.stream()
-                .map(ParticipantFormation::getParticipant)
-                .collect(Collectors.toSet());
-    }
 
     @PrePersist
     protected void onCreate() {

@@ -1,5 +1,7 @@
 package com.example.backend_mp.entity;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +21,11 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ParticipantFormation {
     
     @EmbeddedId
+    @EqualsAndHashCode.Include
     private ParticipantFormationId id;
     
     @ManyToOne(fetch = FetchType.LAZY)

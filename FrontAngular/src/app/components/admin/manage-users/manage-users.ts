@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService, Role } from '../../../core/services/user.service';
+import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UtilisateurDTO } from '../../../models/user.interface';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -16,8 +16,12 @@ import { UserModal, UserFormPayload } from './user-modal/user-modal';
 })
 export class ManageUsers implements OnInit {
 
-  utilisateurs: UtilisateurDTO[] = [];
-  roles: Role[] = [];
+  private userService = inject(UserService);
+  private authService = inject(AuthService);
+  private themeService = inject(ThemeService);
+
+  readonly utilisateurs = this.userService.utilisateurs;
+  readonly roles = this.userService.roles;
 
   loading = false;
   error: string | null = null;
@@ -28,43 +32,30 @@ export class ManageUsers implements OnInit {
   editingUser: UtilisateurDTO | null = null;
 
   // Filters
-  filterRole = 'ALL';
-  filterStatus = 'ALL';
-  searchText = '';
+  readonly filterRole = signal('ALL');
+  readonly filterStatus = signal('ALL');
+  readonly searchText = signal('');
 
-  constructor(
-    private userService: UserService,
-    private authService: AuthService,
-    private themeService: ThemeService,
-  ) {}
+  readonly filteredUsers = computed<UtilisateurDTO[]>(() => {
+    const role = this.filterRole();
+    const status = this.filterStatus();
+    const search = this.searchText().toLowerCase();
+    return this.utilisateurs().filter(user => {
+      if (role !== 'ALL' && user.roleName !== role) return false;
+      if (status === 'ACTIVE' && !user.actif) return false;
+      if (status === 'INACTIVE' && user.actif) return false;
+      if (search && !user.login.toLowerCase().includes(search)) return false;
+      return true;
+    });
+  });
 
   get isDark(): boolean {
     return this.themeService.isDark();
   }
 
   ngOnInit(): void {
-    this.loadData();
-  }
-
-  private loadData(): void {
-    this.userService.roles$.subscribe(roles => this.roles = roles);
-    this.userService.utilisateurs$.subscribe(users => this.utilisateurs = users);
-
     this.userService.loadRoles();
     this.userService.loadUtilisateurs();
-  }
-
-  getFilteredUsers(): UtilisateurDTO[] {
-    return this.utilisateurs.filter(user => {
-      if (this.filterRole !== 'ALL' && user.roleName !== this.filterRole) return false;
-      if (this.filterStatus === 'ACTIVE' && !user.actif) return false;
-      if (this.filterStatus === 'INACTIVE' && user.actif) return false;
-
-      if (this.searchText) {
-        return user.login.toLowerCase().includes(this.searchText.toLowerCase());
-      }
-      return true;
-    });
   }
 
   openCreateModal(): void {
@@ -114,7 +105,7 @@ export class ManageUsers implements OnInit {
   }
 
   private applyEdits(userId: number, data: UserFormPayload): void {
-    const original = this.utilisateurs.find(u => u.id === userId);
+    const original = this.utilisateurs().find(u => u.id === userId);
     if (!original) {
       this.loading = false;
       return;
@@ -123,7 +114,7 @@ export class ManageUsers implements OnInit {
     const tasks: { run: () => void; label: string }[] = [];
 
     if (data.role !== original.roleName) {
-      const role = this.roles.find(r => r.nom === data.role);
+      const role = this.roles().find(r => r.nom === data.role);
       if (role) {
         tasks.push({
           label: 'role',
@@ -221,8 +212,8 @@ export class ManageUsers implements OnInit {
   }
 
   resetFilters(): void {
-    this.filterRole = 'ALL';
-    this.filterStatus = 'ALL';
-    this.searchText = '';
+    this.filterRole.set('ALL');
+    this.filterStatus.set('ALL');
+    this.searchText.set('');
   }
 }

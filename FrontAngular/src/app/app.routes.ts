@@ -19,6 +19,7 @@ import { ManageFormation } from './components/user/manage-formation/manage-forma
 import { Profile } from './shared/components/profile/profile';
 import { ManageFormateur } from './components/user/manage-formateur/manage-formateur';
 import { ManageParticipants } from './components/user/manage-participants/manage-participants';
+import { Dashboard } from './components/dashboard/dashboard';
 
 export const routes: Routes = [
   // Auth routes (no guard - public)
@@ -47,7 +48,7 @@ export const routes: Routes = [
       {
         path: 'user',
         children: [
-          { path: 'dashboard', component: Profile }, // Replace with actual dashboard
+          { path: 'dashboard', component: Dashboard },
           { path: 'trainers', component: ManageFormateur }, // Replace with actual component
           { path: 'trainings', component: ManageFormation }, // Replace with actual component
           { path: 'participants', component: ManageParticipants } // Replace with actual component
@@ -60,8 +61,8 @@ export const routes: Routes = [
       {
         path: 'manager',
         children: [
-          { path: 'dashboard', component: Profile }, // Replace with actual dashboard
-          { path: 'statistics', component: Testing }, // Replace with actual component
+          { path: 'dashboard', component: Dashboard },
+          { path: 'statistics', component: Dashboard },
           { path: 'reports', component: Testing }, // Replace with actual component
         ],
         canActivate: [RoleGuard],
@@ -72,7 +73,7 @@ export const routes: Routes = [
       {
         path: 'admin',
         children: [
-          { path: 'dashboard', component: Profile }, // Replace with actual dashboard
+          { path: 'dashboard', component: Dashboard },
           { path: 'users', component: ManageUsers },
           { path: 'domains', component: Testing }, // Replace with actual component
           { path: 'structures', component: Testing }, // Replace with actual component
@@ -86,7 +87,7 @@ export const routes: Routes = [
       // Default dashboard redirect
       {
         path: 'dashboard',
-        component: Testing, // Replace with actual component
+        component: Dashboard,
         canActivate: [AuthGuard]
       }
     ]

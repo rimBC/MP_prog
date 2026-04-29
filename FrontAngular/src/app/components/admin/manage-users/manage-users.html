@@ -33,7 +33,7 @@
                 <div class="flex flex-col min-w-40">
                     <h2 class="text-xl font-bold text-primary">Filters</h2>
                     <p class="text-sec text-sm">
-                        Showing {{ getFilteredUsers().length }} of {{ utilisateurs.length }} users
+                        Showing {{ filteredUsers().length }} of {{ utilisateurs().length }} users
                     </p>
                 </div>
                 <div class="flex text-sec h-11">
@@ -45,23 +45,24 @@
                                 d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
                     </div>
-                    <input [(ngModel)]="searchText" placeholder="Search by username"
+                    <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
+                        placeholder="Search by username"
                         class="px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
                 </div>
             </div>
 
             <div>
-                <select [(ngModel)]="filterRole"
+                <select [ngModel]="filterRole()" (ngModelChange)="filterRole.set($event)"
                     class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
                     <option value="ALL">All Roles</option>
-                    @for (role of roles; track role.id) {
+                    @for (role of roles(); track role.id) {
                     <option [value]="role.nom">{{ getRoleDisplay(role.nom) }}</option>
                     }
                 </select>
             </div>
 
             <div>
-                <select [(ngModel)]="filterStatus"
+                <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)"
                     class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
                     <option value="ALL">All Status</option>
                     <option value="ACTIVE">Active</option>
@@ -78,9 +79,9 @@
     </div>
 
     <!-- Table Layout -->
-    <app-my-table-layout ListName="Users" Name="User" [Total]="getFilteredUsers().length.toString()">
+    <app-my-table-layout ListName="Users" Name="User" [Total]="filteredUsers().length.toString()">
 
-        @if (getFilteredUsers().length === 0) {
+        @if (filteredUsers().length === 0) {
         <div class="p-12 text-center text-sec">No users found</div>
         } @else {
         <table class="min-w-full divide-y myBorder">
@@ -93,7 +94,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y myBorder bg-sec">
-                @for (user of getFilteredUsers(); track user.id) {
+                @for (user of filteredUsers(); track user.id) {
                 <tr class="hover:bg-sec transition myBorder">
                     <td class="px-6 py-4 text-primary font-medium">{{ user.login }}</td>
                     <td class="px-6 py-4">
@@ -143,7 +144,7 @@
     <!-- Modal -->
     <app-user-modal
         [isOpen]="modalOpen"
-        [roles]="roles"
+        [roles]="roles()"
         [user]="editingUser"
         [loading]="loading"
         (closed)="closeModal()"

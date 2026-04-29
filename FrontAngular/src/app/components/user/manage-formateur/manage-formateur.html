@@ -2,12 +2,12 @@
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold text-primary mb-2">Trainer Management</h1>
-            <p class="text-sec">Manage training instructors (internal and external)</p>
+            <h1 class="text-4xl font-bold text-primary mb-2">Formateurs Management</h1>
+            <p class="text-sec">Gerer les Formateurs des formations (Interne et Externe)</p>
         </div>
         <div class="flex gap-4 items-center">
             <button (click)="openCreateModal()" class="btn btn-primary font-medium rounded-lg transition text-sm">
-                ✚ Add Trainer
+                ✚ Ajouter Formateur
             </button>
         </div>
     </div>
@@ -27,17 +27,17 @@
     <!-- Filters Section -->
     <div class="bg-sec rounded-lg shadow-lg p-4 mb-8">
 
-        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 items-center">
+        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 items-center transition-all ease-in-out">
         
         
-            <div class=" flex justify-between items-center text-sec md:col-span-2 lg:col-span-4">
-                <div class="flex flex-col min-w-40 ">
+            <div class="flex justify-between items-center text-sec md:col-span-2 lg:col-span-4">
+                <div class="hidden lg:flex flex-col min-w-40 ">
                 <h2 class="text-xl font-bold text-primary">Filters</h2>
                 <p class="text-sec text-sm">
-                    Showing {{ getFilteredFormateurs().length }} of {{ formateurs.length }} trainers
+                    Affiche {{ filteredFormateurs().length }} de {{ formateurs().length }} Formateurs
                 </p>
             </div>
-                <div class=" flex text-sec h-11">
+                <div class="flex text-sec h-11">
                 <div
                     class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -46,17 +46,18 @@
                             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
                 </div>
-                <input [(ngModel)]="searchText" placeholder="Search"
+                <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
+                    placeholder="Search"
                     class="px-4 py-2 bg-base border myBorder rounded-r-md outline-none " />
             </div>
             </div>
             <div>
 
-                <select [(ngModel)]="filterType"
+                <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)"
                     class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
                     <option value="ALL">All Types</option>
-                    <option value="interne">Internal</option>
-                    <option value="externe">External</option>
+                    <option value="INTERNE">Interne</option>
+                    <option value="EXTERNE">Externe</option>
                 </select>
             </div>
 
@@ -72,7 +73,7 @@
 
     <!-- Trainers Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        @for (formateur of getFilteredFormateurs(); track formateur.id) {
+        @for (formateur of filteredFormateurs(); track formateur.id) {
         <app-formateur-card
             [formateur]="formateur"
             (deleteClicked)="deleteFormateur($event)"
@@ -83,7 +84,7 @@
 
     <app-formateur-modal
         [isOpen]="modalOpen"
-        [employeurs]="employeurs"
+        [employeurs]="employeurs()"
         [formateur]="editingFormateur"
         [loading]="loading"
         (closed)="closeModal()"

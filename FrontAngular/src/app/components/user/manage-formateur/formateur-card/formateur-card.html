@@ -11,7 +11,7 @@
         <div class="flex-1 min-w-0 flex flex-col gap-1">
             <h3 class="text-sm sm:text-base font-semibold text-primary truncate">{{ fullName }}</h3>
             <p class="text-xs text-sec truncate mt-0.5">{{ formateur.specialite }}</p>
-            <span [ngClass]="formateur.type == 'interne' ? 'bg-primary' : 'bg-red-200'"  class="px-3 py-1 rounded-full text-xs font-semibold text-primary max-w-20 mt-1 ">
+            <span [ngClass]="formateur.type.toUpperCase() == 'INTERNE' ? 'bg-stats-6' : 'bg-stats-4'"  class="px-3 py-1 rounded-full text-xs font-semibold text-primary max-w-20 mt-1 ">
                     {{ formateur.type.toUpperCase()}}
                 </span>
         </div>
@@ -60,7 +60,6 @@
             </svg>
             <span class="text-primary">{{ formateur.tel }}</span>
         </div>
-
         @if (formateur.employeurNom) {
         <div class="flex items-center gap-2 text-sec">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,6 +68,15 @@
             </svg>
             <span class="truncate text-primary">{{ formateur.employeurNom }}</span>
         </div>
+        }
+        @else{
+            <div class="flex items-center gap-2 text-sec">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span class="truncate text-primary"> Excellent Training</span>
+            </div>
         }
     </dl>
 

@@ -1,0 +1,234 @@
+<div class="bg-base text-primary min-h-screen transition-colors duration-300 p-3 sm:p-5 lg:p-6 space-y-5 lg:space-y-6">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-primary">Tableau de bord</h1>
+            <p class="text-sec text-xs sm:text-sm mt-1">Vue d'ensemble des formations, participants et formateurs.</p>
+        </div>
+        <button type="button" (click)="resetFilters()"
+                class="btn btn-outline self-start sm:self-auto whitespace-nowrap">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Réinitialiser
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <label class="block">
+            <span class="text-xs font-medium text-sec uppercase tracking-wider">Domaine</span>
+            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
+                    [ngModel]="filterDomaine()" (ngModelChange)="filterDomaine.set($event)">
+                <option value="ALL">Tous les domaines</option>
+                @for (d of domaines(); track d.id) {
+                    <option [value]="d.id">{{ d.libelle }}</option>
+                }
+            </select>
+        </label>
+
+        <label class="block">
+            <span class="text-xs font-medium text-sec uppercase tracking-wider">Statut</span>
+            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
+                    [ngModel]="filterStatut()" (ngModelChange)="filterStatut.set($event)">
+                <option value="ALL">Tous les statuts</option>
+                @for (s of availableStatuses(); track s) {
+                    <option [value]="s">{{ statusLabel(s) }}</option>
+                }
+            </select>
+        </label>
+
+        <label class="block">
+            <span class="text-xs font-medium text-sec uppercase tracking-wider">Année</span>
+            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
+                    [ngModel]="filterAnnee()" (ngModelChange)="filterAnnee.set($event)">
+                <option value="ALL">Toutes les années</option>
+                @for (y of availableYears(); track y) {
+                    <option [value]="y">{{ y }}</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <app-kpi-card label="Total formations"
+                      [value]="totalFormations()"
+                      icon="bi-mortarboard-fill"
+                      [tone]="1"></app-kpi-card>
+
+        <app-kpi-card label="Participants actifs"
+                      [value]="participantsActifs()"
+                      icon="bi-people-fill"
+                      [tone]="2"></app-kpi-card>
+
+        <app-kpi-card label="Budget total"
+                      [value]="formatCurrency(budgetTotal())"
+                      icon="bi-cash-coin"
+                      [tone]="3"></app-kpi-card>
+
+        <app-kpi-card label="Durée moyenne"
+                      [value]="dureeMoyenne() + ' h'"
+                      icon="bi-clock-history"
+                      [tone]="5"></app-kpi-card>
+    </div>
+
+    <!-- Charts row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-1">
+            <div class="flex items-center justify-between mb-3 gap-2">
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par statut</h3>
+                <span class="text-xs text-sec whitespace-nowrap">{{ totalFormations() }} formations</span>
+            </div>
+            <app-chart-canvas [config]="statusPieConfig()"></app-chart-canvas>
+        </div>
+
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-2">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par domaine</h3>
+            </div>
+            <app-chart-canvas [config]="domainBarConfig()"></app-chart-canvas>
+        </div>
+    </div>
+
+    <!-- Charts row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-2">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Participants par structure</h3>
+            </div>
+            <app-chart-canvas [config]="structureBarConfig()"></app-chart-canvas>
+        </div>
+
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-1">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Formateurs internes / externes</h3>
+            </div>
+            <app-chart-canvas [config]="formateurTypePieConfig()"></app-chart-canvas>
+        </div>
+    </div>
+
+    <!-- Charts row 3 -->
+    <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-1">
+            <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par mois</h3>
+            <span class="text-xs text-sec">Basé sur la date de début</span>
+        </div>
+        <app-chart-canvas [config]="monthlyLineConfig()"
+                          heightClass="h-56 sm:h-64 lg:h-80"></app-chart-canvas>
+    </div>
+
+    <!-- Search bar -->
+    <div class="flex items-center">
+        <div class="flex w-full sm:w-2/3 lg:w-1/3">
+            <span class="inline-flex items-center justify-center px-3 rounded-l-md btn-primary">
+                <i class="bi bi-search text-sm"></i>
+            </span>
+            <input type="search" placeholder="Rechercher…"
+                   class="flex-1 min-w-0 px-3 py-2 text-sm border myBorder rounded-r-md bg-sec text-primary focus:outline-none"
+                   [ngModel]="searchText()" (ngModelChange)="onSearch($event)">
+        </div>
+    </div>
+
+    <!-- Formations table -->
+    <app-my-table-layout ListName="Formations" [Total]="sortedFormations().length.toString()" [showPagination]="false">
+        <table class="min-w-full divide-y divide-gray-200/30 bg-sec">
+            <thead>
+                <tr>
+                    <th class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
+                        (click)="setSort('titre')">
+                        Titre
+                        <i class="bi" [class.bi-caret-up-fill]="sortKey()==='titre' && sortDir()==='asc'"
+                                      [class.bi-caret-down-fill]="sortKey()==='titre' && sortDir()==='desc'"></i>
+                    </th>
+                    <th class="hidden md:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
+                        (click)="setSort('domaineLibelle')">
+                        Domaine
+                        <i class="bi" [class.bi-caret-up-fill]="sortKey()==='domaineLibelle' && sortDir()==='asc'"
+                                      [class.bi-caret-down-fill]="sortKey()==='domaineLibelle' && sortDir()==='desc'"></i>
+                    </th>
+                    <th class="hidden sm:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
+                        (click)="setSort('duree')">
+                        Durée
+                        <i class="bi" [class.bi-caret-up-fill]="sortKey()==='duree' && sortDir()==='asc'"
+                                      [class.bi-caret-down-fill]="sortKey()==='duree' && sortDir()==='desc'"></i>
+                    </th>
+                    <th class="hidden lg:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
+                        (click)="setSort('budget')">
+                        Budget
+                        <i class="bi" [class.bi-caret-up-fill]="sortKey()==='budget' && sortDir()==='asc'"
+                                      [class.bi-caret-down-fill]="sortKey()==='budget' && sortDir()==='desc'"></i>
+                    </th>
+                    <th class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
+                        (click)="setSort('statut')">
+                        Statut
+                        <i class="bi" [class.bi-caret-up-fill]="sortKey()==='statut' && sortDir()==='asc'"
+                                      [class.bi-caret-down-fill]="sortKey()==='statut' && sortDir()==='desc'"></i>
+                    </th>
+                    <th class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
+                        (click)="setSort('nombreParticipants')">
+                        <span class="hidden sm:inline">Participants</span>
+                        <span class="sm:hidden">Pers.</span>
+                        <i class="bi" [class.bi-caret-up-fill]="sortKey()==='nombreParticipants' && sortDir()==='asc'"
+                                      [class.bi-caret-down-fill]="sortKey()==='nombreParticipants' && sortDir()==='desc'"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (f of pagedFormations(); track f.id) {
+                    <tr class="hover:bg-primary/5 transition-colors border-t myBorder">
+                        <td class="px-3 sm:px-4 py-3 text-sm font-medium text-primary">
+                            <div class="truncate max-w-[160px] sm:max-w-none">{{ f.titre }}</div>
+                            <div class="md:hidden text-xs text-sec truncate max-w-[160px]">{{ f.domaineLibelle ?? '—' }}</div>
+                        </td>
+                        <td class="hidden md:table-cell px-3 sm:px-4 py-3 text-sm text-primary">{{ f.domaineLibelle ?? '—' }}</td>
+                        <td class="hidden sm:table-cell px-3 sm:px-4 py-3 text-sm text-primary whitespace-nowrap">{{ f.duree }} h</td>
+                        <td class="hidden lg:table-cell px-3 sm:px-4 py-3 text-sm text-primary whitespace-nowrap">{{ formatCurrency(f.budget ?? 0) }}</td>
+                        <td class="px-3 sm:px-4 py-3 text-sm">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap"
+                                  [ngClass]="statusToneClass(f.statut)">
+                                {{ statusLabel(f.statut) }}
+                            </span>
+                        </td>
+                        <td class="px-3 sm:px-4 py-3 text-sm text-primary whitespace-nowrap">{{ f.nombreParticipants ?? f.participantIds?.length ?? 0 }}</td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-sec text-sm">
+                            Aucune formation ne correspond aux filtres.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Custom pagination footer -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-3 sm:px-4 py-3 bg-sec border-t myBorder">
+            <p class="text-xs sm:text-sm text-sec text-center sm:text-left">
+                Page <span class="font-medium text-primary">{{ pageIndex() + 1 }}</span>
+                / <span class="font-medium text-primary">{{ totalPages() }}</span>
+                — <span class="font-medium text-primary">{{ sortedFormations().length }}</span> résultats
+            </p>
+            <nav class="inline-flex -space-x-px self-center sm:self-auto">
+                <button class="px-3 py-1.5 text-sec border myBorder rounded-l-md hover:bg-primary/10 disabled:opacity-50"
+                        [disabled]="pageIndex() === 0"
+                        (click)="goToPage(pageIndex() - 1)">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                @for (p of pageNumbers(); track p) {
+                    <button class="px-3 py-1.5 text-sm border myBorder"
+                            [class.btn-primary]="p === pageIndex()"
+                            [class.text-primary]="p !== pageIndex()"
+                            (click)="goToPage(p)">
+                        {{ p + 1 }}
+                    </button>
+                }
+                <button class="px-3 py-1.5 text-sec border myBorder rounded-r-md hover:bg-primary/10 disabled:opacity-50"
+                        [disabled]="pageIndex() >= totalPages() - 1"
+                        (click)="goToPage(pageIndex() + 1)">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </nav>
+        </div>
+    </app-my-table-layout>
+
+</div>

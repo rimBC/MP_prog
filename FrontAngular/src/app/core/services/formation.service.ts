@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { FormationDTO } from '../../models/formationDTO.interface';
 
@@ -11,15 +11,15 @@ export class FormationService {
 
   private apiUrl = 'http://localhost:8080/api/formations';
 
-  private formationsSubject = new BehaviorSubject<FormationDTO[]>([]);
-  public formations$ = this.formationsSubject.asObservable();
+  private _formations = signal<FormationDTO[]>([]);
+  readonly formations = this._formations.asReadonly();
 
   constructor(private http: HttpClient) { }
 
   /** GET /api/formations */
   getFormations(): Observable<FormationDTO[]> {
     return this.http.get<FormationDTO[]>(this.apiUrl).pipe(
-      tap(data => this.formationsSubject.next(data)),
+      tap(data => this._formations.set(data)),
       catchError(error => {
         console.error('Error loading formations:', error);
         return of([]);
@@ -40,7 +40,7 @@ export class FormationService {
   createFormation(formation: FormationDTO): Observable<FormationDTO> {
     return this.http.post<FormationDTO>(this.apiUrl, formation).pipe(
       tap(created => {
-        this.formationsSubject.next([...this.formationsSubject.value, created]);
+        this._formations.update(current => [...current, created]);
       })
     );
   }
@@ -49,13 +49,13 @@ export class FormationService {
   updateFormation(id: number, formation: FormationDTO): Observable<FormationDTO> {
     return this.http.put<FormationDTO>(`${this.apiUrl}/${id}`, formation).pipe(
       tap(updated => {
-        const current = this.formationsSubject.value;
-        const idx = current.findIndex(f => f.id === id);
-        if (idx !== -1) {
+        this._formations.update(current => {
+          const idx = current.findIndex(f => f.id === id);
+          if (idx === -1) return current;
           const next = [...current];
           next[idx] = updated;
-          this.formationsSubject.next(next);
-        }
+          return next;
+        });
       })
     );
   }
@@ -64,9 +64,7 @@ export class FormationService {
   deleteFormation(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
-        this.formationsSubject.next(
-          this.formationsSubject.value.filter(f => f.id !== id)
-        );
+        this._formations.update(current => current.filter(f => f.id !== id));
       })
     );
   }
@@ -105,6 +103,6 @@ export class FormationService {
   }
 
   getCurrentFormations(): FormationDTO[] {
-    return this.formationsSubject.value;
+    return this._formations();
   }
 }

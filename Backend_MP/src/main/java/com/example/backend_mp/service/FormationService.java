@@ -220,8 +220,11 @@ public class FormationService {
             .formateurId(formation.getFormateur().getId())
             .formateurNom(formation.getFormateur().getNom() + " " + formation.getFormateur().getPrenom())
             .domaineId(formation.getDomaine().getId())
-                .domaineLibelle(formation.getDomaine().getLibelle())
-                .nombreParticipants((int) formation.getParticipants().size())
+            .domaineLibelle(formation.getDomaine().getLibelle())
+            .nombreParticipants((int) formation.getParticipantFormations()
+        .stream()
+        .map(ParticipantFormation::getParticipant)
+        .collect(Collectors.toSet()).size())
             .build();
     }
 }

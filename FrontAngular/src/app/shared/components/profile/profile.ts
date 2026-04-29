@@ -72,19 +72,16 @@ export class Profile implements OnInit {
   private loadData(): void {
     this.loading = true;
 
-    this.formationService.formations$.subscribe(formations => {
+    this.formationService.getFormations().subscribe(formations => {
       this.allFormations = formations;
       this.calculateStats();
     });
 
-    this.participantService.participants$.subscribe(participants => {
+    this.participantService.getParticipants().subscribe(participants => {
       this.allParticipants = participants;
       this.findUserParticipant();
       this.calculateStats();
     });
-
-    this.formationService.loadFormations();
-    this.participantService.loadParticipants();
 
     this.loading = false;
   }

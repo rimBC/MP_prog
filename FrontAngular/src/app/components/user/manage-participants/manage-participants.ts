@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ParticipantDTO, ParticipantService, Profil, Structure } from '../../../core/services/participant.service';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ParticipantDTO, ParticipantService } from '../../../core/services/participant.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MyTableLayout } from '../../../shared/components/my-table-layout/my-table-layout';
@@ -13,9 +13,11 @@ import { ParticipantModal } from './participant-modal/participant-modal';
 })
 export class ManageParticipants implements OnInit {
 
-  participants: ParticipantDTO[] = [];
-  structures: Structure[] = [];
-  profils: Profil[] = [];
+  private participantService = inject(ParticipantService);
+
+  readonly participants = this.participantService.participants;
+  readonly structures = this.participantService.structures;
+  readonly profils = this.participantService.profils;
 
   loading = false;
   error: string | null = null;
@@ -26,56 +28,36 @@ export class ManageParticipants implements OnInit {
   editingParticipant: ParticipantDTO | null = null;
 
   // Filters
-  filterStructure = 'ALL';
-  filterProfil = 'ALL';
-  filterStatus = 'ALL';
-  searchText = '';
+  readonly filterStructure = signal('ALL');
+  readonly filterProfil = signal('ALL');
+  readonly filterStatus = signal('ALL');
+  readonly searchText = signal('');
 
-  constructor(private participantService: ParticipantService) { }
+  readonly filteredParticipants = computed<ParticipantDTO[]>(() => {
+    const structure = this.filterStructure();
+    const profil = this.filterProfil();
+    const status = this.filterStatus();
+    const search = this.searchText().toLowerCase();
 
-  ngOnInit(): void {
-    this.loadData();
-  }
-
-  private loadData(): void {
-    this.participantService.participants$.subscribe(participants => {
-      this.participants = participants;
-    });
-
-    this.participantService.structures$.subscribe(structures => {
-      this.structures = structures;
-    });
-
-    this.participantService.profils$.subscribe(profils => {
-      this.profils = profils;
-    });
-
-    this.participantService.loadParticipants();
-    this.participantService.loadStructures();
-    this.participantService.loadProfils();
-  }
-
-  getFilteredParticipants(): ParticipantDTO[] {
-    return this.participants.filter(participant => {
-      if (this.filterStructure !== 'ALL' && participant.structureId !== parseInt(this.filterStructure)) {
-        return false;
-      }
-      if (this.filterProfil !== 'ALL' && participant.profilId !== parseInt(this.filterProfil)) {
-        return false;
-      }
-      if (this.filterStatus !== 'ALL') {
-        if (this.filterStatus === 'ACTIVE' && !participant.actif) return false;
-        if (this.filterStatus === 'INACTIVE' && participant.actif) return false;
-      }
-      if (this.searchText) {
-        const searchLower = this.searchText.toLowerCase();
-        return `${participant.prenom} ${participant.nom}`.toLowerCase().includes(searchLower) ||
-               (participant.email?.toLowerCase().includes(searchLower) ?? false) ||
-               (participant.structureLibelle?.toLowerCase().includes(searchLower) ?? false) ||
-               (participant.profilLibelle?.toLowerCase().includes(searchLower) ?? false);
+    return this.participants().filter(participant => {
+      if (structure !== 'ALL' && participant.structureId !== parseInt(structure)) return false;
+      if (profil !== 'ALL' && participant.profilId !== parseInt(profil)) return false;
+      if (status === 'ACTIVE' && !participant.actif) return false;
+      if (status === 'INACTIVE' && participant.actif) return false;
+      if (search) {
+        return `${participant.prenom} ${participant.nom}`.toLowerCase().includes(search) ||
+               (participant.email?.toLowerCase().includes(search) ?? false) ||
+               (participant.structureLibelle?.toLowerCase().includes(search) ?? false) ||
+               (participant.profilLibelle?.toLowerCase().includes(search) ?? false);
       }
       return true;
     });
+  });
+
+  ngOnInit(): void {
+    this.participantService.loadParticipants();
+    this.participantService.loadStructures();
+    this.participantService.loadProfils();
   }
 
   openCreateModal(): void {
@@ -173,19 +155,19 @@ export class ManageParticipants implements OnInit {
   }
 
   resetFilters(): void {
-    this.filterStructure = 'ALL';
-    this.filterProfil = 'ALL';
-    this.filterStatus = 'ALL';
-    this.searchText = '';
+    this.filterStructure.set('ALL');
+    this.filterProfil.set('ALL');
+    this.filterStatus.set('ALL');
+    this.searchText.set('');
   }
 
   getStructureName(structureId: number): string {
-    const structure = this.structures.find(s => s.id === structureId);
+    const structure = this.structures().find(s => s.id === structureId);
     return structure?.libelle || 'Unknown';
   }
 
   getProfilName(profilId: number): string {
-    const profil = this.profils.find(p => p.id === profilId);
+    const profil = this.profils().find(p => p.id === profilId);
     return profil?.libelle || 'Unknown';
   }
 
