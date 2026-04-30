@@ -326,6 +326,76 @@ UC_FILTER_F ..> UC_LIST_F : <<extend>>
 
 ## 6. Mise en place (Set up)
 
-> *Section à compléter.*
+### 6.1. Prérequis
+
+- **Java 17+** et **Maven 3.8+** (backend Spring Boot)
+- **PostgreSQL 13+** (base de données)
+- **Node.js 18+** et **npm** (frontend Angular)
+- **Git**
+
+### 6.2. Base de données
+
+```bash
+psql -U postgres
+```
+
+```sql
+CREATE DATABASE training_db;
+CREATE USER training_user WITH PASSWORD 'training_password';
+GRANT ALL PRIVILEGES ON DATABASE training_db TO training_user;
+```
+
+Initialiser le schéma puis charger les données de test :
+
+```bash
+psql -U training_user -d training_db -f schema.sql
+psql -U training_user -d training_db -f Backend_MP/src/main/resources/seed.sql
+```
+
+Le script `seed.sql` est idempotent (`TRUNCATE … RESTART IDENTITY`) et alimente la base sur la période **2021 → 2026 (T2)** : 4 rôles, 25 formateurs, 100 participants, ~90 formations et ~720 inscriptions, afin que les tableaux de bord disposent d'un historique pluriannuel.
+
+### 6.3. Backend (Spring Boot)
+
+Configurer `Backend_MP/src/main/resources/application.properties` (URL JDBC, login, mot de passe, secret JWT), puis :
+
+```bash
+cd Backend_MP
+mvn clean install -DskipTests
+mvn spring-boot:run
+```
+
+- API : **http://localhost:8080/api**
+- Swagger UI : **http://localhost:8080/api/swagger-ui.html**
+
+### 6.4. Frontend (Angular)
+
+```bash
+cd FrontAngular
+npm install
+npm start          # ou : ng serve
+```
+
+Application accessible sur **http://localhost:4200**.
+
+L'URL de l'API est définie dans `src/app/core/config/settings.config.ts` — à adapter si le backend n'est pas sur `http://localhost:8080`.
+
+### 6.5. Comptes de test
+
+| Login           | Mot de passe   | Rôle              |
+|-----------------|----------------|-------------------|
+| `admin`         | `password123`  | ADMIN             |
+| `gestionnaire1` | `password123`  | GESTIONNAIRE      |
+| `m.bensalah`    | `password123`  | FORMATEUR         |
+| `rh.lecture`    | `password123`  | CONSULTATION      |
+
+### 6.6. Vérification
+
+```sql
+SELECT 'formation' AS table_, COUNT(*) FROM public.formation
+UNION ALL SELECT 'participant',           COUNT(*) FROM public.participant
+UNION ALL SELECT 'participant_formation', COUNT(*) FROM public.participant_formation;
+```
+
+Une fois le backend et le frontend lancés, se connecter via `/auth/login` redirige vers la zone correspondant au rôle (`/user`, `/manager` ou `/admin`).
 
 ---
