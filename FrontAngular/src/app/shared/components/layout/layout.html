@@ -21,7 +21,30 @@
                     }
                 </li>
             }
+            <!-- <li [class.pl-6]="sidebarOpen" [class.justify-center]="!sidebarOpen"
+                class=" w-11/12 rounded-xl flex items-center  text-gray-300/80 tracking-wider text-sm lg:text-base cursor-pointer transition-all ease-in-out hover:bg-gray-400/5 gap-0.5 h-12 group">
+                @if (currentUser) {
+                <button (click)="logout()"
+                    class=" text-sm font-medium rounded-md transition-colors duration-200 btn  h-full w-full group hover:bg-slate-800 group relative">
+                    <span class="text-lg text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            stroke-width="1.4" fill="none" stroke="currentColor" class="size-7">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                        </svg>
+                    </span>
+                    @if (!sidebarOpen) {
+                    <span class="tooltip group-hover:scale-100 left-16">Logout</span>
+                    }
+                    @if (sidebarOpen) {
+                    <span class="ml-4 font-medium text-nowrap">Logout</span>
+                    }
             
+            
+                </button>
+            
+            
+                }
+            </li> -->
             
             </ul>
 <!-- Toggle Sidebar -->
@@ -154,7 +177,7 @@
             </div>
         </nav>
         <!-- Content -->
-        <main class="overflow-auto mt-14 bg-base h-full rounded-lg">
+        <main class="overflow-auto mt-14 bg-base h-full rounded-tl-lg ">
                 <router-outlet class="min-h-full"></router-outlet>
         </main>
         

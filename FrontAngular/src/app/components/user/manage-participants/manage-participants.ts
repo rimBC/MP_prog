@@ -1,7 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ParticipantDTO, ParticipantService } from '../../../core/services/participant.service';
+import { FormationService } from '../../../core/services/formation.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MyTableLayout } from '../../../shared/components/my-table-layout/my-table-layout';
 import { ParticipantModal } from './participant-modal/participant-modal';
 
@@ -14,10 +16,24 @@ import { ParticipantModal } from './participant-modal/participant-modal';
 export class ManageParticipants implements OnInit {
 
   private participantService = inject(ParticipantService);
+  private formationService = inject(FormationService);
+  private router = inject(Router);
 
   readonly participants = this.participantService.participants;
   readonly structures = this.participantService.structures;
   readonly profils = this.participantService.profils;
+  readonly formations = this.formationService.formations;
+
+  readonly formationCountByParticipant = computed<Map<number, number>>(() => {
+    const map = new Map<number, number>();
+    for (const f of this.formations()) {
+      if (!Array.isArray(f.participantIds)) continue;
+      for (const pid of f.participantIds) {
+        map.set(pid, (map.get(pid) ?? 0) + 1);
+      }
+    }
+    return map;
+  });
 
   loading = false;
   error: string | null = null;
@@ -58,6 +74,12 @@ export class ManageParticipants implements OnInit {
     this.participantService.loadParticipants();
     this.participantService.loadStructures();
     this.participantService.loadProfils();
+    this.formationService.loadFormations();
+  }
+
+  formationCount(participant: ParticipantDTO): number {
+    if (participant.id === undefined) return 0;
+    return this.formationCountByParticipant().get(participant.id) ?? 0;
   }
 
   openCreateModal(): void {
@@ -65,9 +87,15 @@ export class ManageParticipants implements OnInit {
     this.modalOpen = true;
   }
 
-  editParticipant(participant: ParticipantDTO): void {
+  editParticipant(participant: ParticipantDTO, event?: Event): void {
+    if (event) event.stopPropagation();
     this.editingParticipant = participant;
     this.modalOpen = true;
+  }
+
+  viewParticipant(participant: ParticipantDTO): void {
+    if (participant.id === undefined) return;
+    this.router.navigate(['/user/participants', participant.id]);
   }
 
   closeModal(): void {
@@ -111,7 +139,8 @@ export class ManageParticipants implements OnInit {
     }
   }
 
-  deleteParticipant(participant: ParticipantDTO): void {
+  deleteParticipant(participant: ParticipantDTO, event?: Event): void {
+    if (event) event.stopPropagation();
     if (participant.id === undefined) return;
     if (!confirm(`Are you sure you want to delete '${participant.prenom} ${participant.nom}'?`)) return;
 

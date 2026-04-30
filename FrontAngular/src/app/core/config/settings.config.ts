@@ -19,5 +19,10 @@ export const settings: MenuItem[] = [
         route: '/admin/profiles',
         roles: ['ADMINISTRATEUR']
       },
-      
+      {
+        label: 'Employeur',
+        icon: '👔',
+        route: '/admin/employeur',
+        roles: ['ADMINISTRATEUR']
+      },
     ];

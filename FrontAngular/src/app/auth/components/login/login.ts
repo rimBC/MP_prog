@@ -30,7 +30,7 @@ export class Login implements OnInit{
  
   ngOnInit(): void {
     // Get return URL from route parameters or default to dashboard
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/Home';
  
     // Redirect to dashboard if already logged in
     if (this.authService.isAuthenticated()==true) {
@@ -78,9 +78,9 @@ export class Login implements OnInit{
   private redirectByRole(role: string): void {
 
     const dashboardMap: { [key: string]: string } = {
-      'SIMPLE_UTILISATEUR': '/user/dashboard',
-      'RESPONSABLE': '/manager/dashboard',
-      'ADMINISTRATEUR': '/admin/dashboard'
+      'SIMPLE_UTILISATEUR': '/user/trainers',
+      'RESPONSABLE': '/user/trainers',
+      'ADMINISTRATEUR': '/user/trainers'
     };
  
     const dashboardUrl = dashboardMap[role] || '/dashboard';

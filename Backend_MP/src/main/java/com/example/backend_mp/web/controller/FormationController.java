@@ -157,4 +157,31 @@ public class FormationController {
         log.info("Counting formations for domain: {}", domaineId);
         return ResponseEntity.ok(formationService.getFormationsCountByDomain(domaineId));
     }
+
+    /**
+     * Enroll a participant in a formation
+     */
+    @PostMapping("/{id}/participants/{participantId}")
+    @PreAuthorize("hasAnyRole('SIMPLE_UTILISATEUR', 'ADMINISTRATEUR')")
+    @Operation(summary = "Enroll participant", description = "Enroll a participant in a training session")
+    public ResponseEntity<FormationDTO> enrollParticipant(
+            @PathVariable Long id,
+            @PathVariable Long participantId) {
+        log.info("Enrolling participant {} in formation {}", participantId, id);
+        return ResponseEntity.ok(formationService.enrollParticipant(id, participantId));
+    }
+
+    /**
+     * Remove a participant from a formation
+     */
+    @DeleteMapping("/{id}/participants/{participantId}")
+    @PreAuthorize("hasAnyRole('SIMPLE_UTILISATEUR', 'ADMINISTRATEUR')")
+    @Operation(summary = "Remove participant", description = "Remove a participant from a training session")
+    public ResponseEntity<Void> removeParticipant(
+            @PathVariable Long id,
+            @PathVariable Long participantId) {
+        log.info("Removing participant {} from formation {}", participantId, id);
+        formationService.removeParticipant(id, participantId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -1,0 +1,80 @@
+@if (isOpen) {
+<div data-backdrop="true"
+    class="fixed inset-0 z-10 flex items-center justify-center p-8 bg-black/50 backdrop-blur-xs modal-backdrop ml-16 mt-14"
+    (click)="onBackdropClick($event)">
+
+    <div class="bg-base rounded-lg shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl max-h-[85vh] flex flex-col modal-panel">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b myBorder">
+            <h2 class="text-2xl font-bold text-primary">Add Participant</h2>
+            <button type="button" (click)="close()"
+                class="w-8 h-8 rounded-full flex items-center justify-center text-sec hover:bg-sec hover:text-primary transition"
+                aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+
+            <!-- Search -->
+            <div class="mb-4">
+                <input type="text" [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
+                    placeholder="Search by name, email, department, profile…"
+                    class="w-full px-4 py-2 bg-sec border myBorder rounded-lg outline-none focus:ring-2 focus:ring-(--color-btn-primary)" />
+            </div>
+
+            <!-- List -->
+            @if (filtered().length === 0) {
+            <div class="text-center text-sec py-12">
+                <p class="text-lg mb-1">No participants available</p>
+                <p class="text-sm">All participants might already be enrolled, or none match your search.</p>
+            </div>
+            } @else {
+            <ul class="divide-y myBorder border myBorder rounded-lg overflow-hidden">
+                @for (p of filtered(); track p.id) {
+                <li (click)="select(p)"
+                    [class.bg-sec]="selectedId() === p.id"
+                    class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-sec transition">
+
+                    <input type="radio" name="participant" [checked]="selectedId() === p.id"
+                        (change)="select(p)"
+                        class="accent-(--color-btn-primary)" />
+
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-primary truncate">{{ p.prenom }} {{ p.nom }}</p>
+                        <p class="text-sm text-sec truncate">{{ p.email }}</p>
+                    </div>
+
+                    <div class="hidden sm:flex flex-col items-end gap-1 shrink-0">
+                        <span class="px-2 py-0.5 bg-base-contrast text-white rounded-full text-xs">
+                            {{ p.structureLibelle }}
+                        </span>
+                        <span class="px-2 py-0.5 bg-base text-primary rounded-full text-xs">
+                            {{ p.profilLibelle }}
+                        </span>
+                    </div>
+                </li>
+                }
+            </ul>
+            }
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-4 px-6 py-4 border-t myBorder">
+            <button type="button" (click)="confirm()"
+                [disabled]="loading || selectedId() === null"
+                class="flex-1 btn-primary py-2 rounded-lg transition disabled:opacity-50">
+                {{ loading ? 'Enrolling…' : 'Enroll' }}
+            </button>
+            <button type="button" (click)="close()"
+                class="flex-1 bg-sec border myBorder text-primary py-2 rounded-lg transition hover:bg-base">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+}

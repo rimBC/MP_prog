@@ -3,10 +3,12 @@
 @import 'tailwindcss';
 
 :root {
-    --color-nav-top: #e1e1e1;
+    --color-nav-top: #e8e8e8;
     --color-nav:#101828;
+        /* --color-nav-top: #1f2a3e;
+            --color-nav: #1f2a3e; */
     --color-bg-contrast: #33619a;
-    --color-bg: #eaeaea;
+    --color-bg: #efefef;
     --color-bg-sec: #f7f7f7;
     --color-text-sec: #62748e;
     --color-text: #3c4f75;
@@ -23,7 +25,7 @@
     --color-primary-950: #021122;
     --color-btn-primary: #4a95e6;
     --color-btn-sec: #021931;
-    --color-text-contrast: #ffffff;
+    --color-text-contrast: #84bdfa;
             /* Neutral / dark */
             --color-neutral-50: #f1f2f4;
             --color-neutral-900: #17181c;
@@ -74,6 +76,28 @@
                 
                     --stats-color-8-bg: #ffe1c2;
                     --stats-color-8-text: #c2410c;
+                    /* =========================
+                       SOLID STATS COLORS
+                       (lighter/saturated versions of text colors)
+                    ========================= */
+                    
+                        --bg-stats-solid-1: #427fc1;
+                        /* from #074a92 */
+                        --bg-stats-solid-3: #3cb180;
+                        /* from #1f7a5a */
+                        --bg-stats-solid-2: #f0b33a;
+                        /* from #b26b00 */
+                        --bg-stats-solid-4: #dc4d4d;
+                        /* from #b42318 */
+                        --bg-stats-solid-5: #a862ed;
+                        /* from #6b21a8 */
+                        --bg-stats-solid-6: #0f78a8;
+                        /* from #075985 */
+                        --bg-stats-solid-7: #1f8f4a;
+                        /* from #166534 */
+                        --bg-stats-solid-8: #e07a1f;
+                        /* from #c2410c */
+
 }
 
 /* =========================
@@ -95,7 +119,7 @@
     /* text */
     --color-text-sec: #848484;
     --color-text: #e8e8e8;
-    --color-text-contrast: #000000;
+    --color-text-contrast: #ccebfbb7;
 
     --color-surface: #17181c;
     /* bg */
@@ -103,7 +127,7 @@
     --color-bg-sec: #292929;
 
     --color-bg-sec2:hsl(0, 0%, 22%);
-    --color-bg-contrast: #33619a;
+    --color-bg-contrast: #2a4363;
     /* button */
     --color-btn-primary: #3c6598;
     --color-btn-sec: #51667e;
@@ -128,19 +152,19 @@
     ========================= */
 
     --stats-color-1-bg: #366390;
-    --stats-color-1-text: #9ecafa;
+    --stats-color-1-text: #d2e4f7;
 
     --stats-color-2-bg: #164734;
-    --stats-color-2-text: #6ee7b7;
+    --stats-color-2-text: #9ef9d5;
 
     --stats-color-3-bg: #5a440b;
-    --stats-color-3-text: #facc15;
+    --stats-color-3-text: #d3c795;
 
     --stats-color-4-bg: #a94242;
-    --stats-color-4-text: #f87171;
+    --stats-color-4-text: #f3bebe;
 
     --stats-color-5-bg: #3b1a85;
-    --stats-color-5-text: #c4b5fd;
+    --stats-color-5-text: #d3c9fb;
 
     --stats-color-6-bg: #0e3f5a;
     --stats-color-6-text: #7dd3fc;
@@ -150,6 +174,26 @@
 
     --stats-color-8-bg: #5a2a0b;
     --stats-color-8-text: #fdba74;
+    /* =========================
+       DARK THEME - SOLID STATS COLORS
+    ========================= */
+    
+        --bg-stats-solid-1: #4f86b8;
+        /* from #366390 */
+        --bg-stats-solid-2: #2f7a5a;
+        /* from #164734 */
+        --bg-stats-solid-3: #ad9351;
+        /* from #5a440b */
+        --bg-stats-solid-4: #b45b5b;
+        /* from #a94242 */
+        --bg-stats-solid-5: #6a42c2;
+        /* from #3b1a85 */
+        --bg-stats-solid-6: #1f6f9a;
+        /* from #0e3f5a */
+        --bg-stats-solid-7: #1c6b3a;
+        /* from #0b3f1f */
+        --bg-stats-solid-8: #8a4a1a;
+        /* from #5a2a0b */
 }
 
 @layer components {
@@ -173,7 +217,7 @@
         }
     
         .input {
-            @apply border-gray-400 py-1 px-2 border rounded-md w-full mt-2 mb-3 sm:mb-2
+            @apply py-1 px-2 border rounded-md w-full mt-2 mb-3 sm:mb-2
         }
     
         .label {
@@ -202,6 +246,11 @@
         border-color: var(--text-btn-outline);
         border-width: 1.5px;
     }
+    .btn-outline:hover {
+                    opacity: 80%;
+                    border-color: var(--color-btn-primary);
+                    color: var(--color-btn-primary);
+                    border-width: 1.5px;}
     .btn-primary {
         color: var(--text-btn-primary);
         background-color: var(--color-btn-primary);
@@ -235,6 +284,9 @@
         .text-primary {
             color: var(--color-text);
         }
+        .text-contrast {
+                    color: var(--color-text-contrast);
+                }
     
         .bg-primary {
             background-color: var(--color-primary-100);
@@ -329,45 +381,45 @@
                    SOLID STATS BACKGROUNDS
                 ========================= */
                 
-                                .bg-stats-solid-1 {
-                                    background-color: var(--stats-color-1-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-2 {
-                                    background-color: var(--stats-color-2-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-3 {
-                                    background-color: var(--stats-color-3-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-4 {
-                                    background-color: var(--stats-color-4-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-5 {
-                                    background-color: var(--stats-color-5-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-6 {
-                                    background-color: var(--stats-color-6-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-7 {
-                                    background-color: var(--stats-color-7-text);
-                                    color: #ffffff;
-                                }
-                
-                                .bg-stats-solid-8 {
-                                    background-color: var(--stats-color-8-text);
-                                    color: #ffffff;
-                                }
+        .bg-stats-solid-1 {
+            background-color: var(--bg-stats-solid-1);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-2 {
+            background-color: var(--bg-stats-solid-2);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-3 {
+            background-color: var(--bg-stats-solid-3);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-4 {
+            background-color: var(--bg-stats-solid-4);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-5 {
+            background-color: var(--bg-stats-solid-5);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-6 {
+            background-color: var(--bg-stats-solid-6);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-7 {
+            background-color: var(--bg-stats-solid-7);
+            color: #ffffff;
+        }
+    
+        .bg-stats-solid-8 {
+            background-color: var(--bg-stats-solid-8);
+            color: #ffffff;
+        }
 }
 
 /* Global Styles

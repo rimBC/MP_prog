@@ -1,0 +1,10 @@
+<div [ngClass]="'bg-stats-' + tone + ' text-stats-' + tone" class="rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 sm:gap-4 h-full">
+    
+    <div class="flex-1 min-w-0">
+        <p class="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate">{{ label }}</p>
+        <p class="text-lg sm:text-2xl font-bold mt-0.5 truncate">{{ value }}</p>
+        @if (hint) {
+            <p class="text-[10px] sm:text-xs text-sec mt-0.5 truncate">{{ hint }}</p>
+        }
+    </div>
+</div>

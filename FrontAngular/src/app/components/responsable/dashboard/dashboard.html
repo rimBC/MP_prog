@@ -1,53 +1,50 @@
 <div class="bg-base text-primary min-h-screen transition-colors duration-300 p-3 sm:p-5 lg:p-6 space-y-5 lg:space-y-6">
 
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-        <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-primary">Tableau de bord</h1>
+    <div class="flex flex-col lg:flex-row lg:items-end sm:justify-between gap-3 ">
+        <div class="w-96">
+            <h1 class="text-xl sm:text-2xl font-bold text-primary ">Tableau de bord</h1>
             <p class="text-sec text-xs sm:text-sm mt-1">Vue d'ensemble des formations, participants et formateurs.</p>
         </div>
-        <button type="button" (click)="resetFilters()"
-                class="btn btn-outline self-start sm:self-auto whitespace-nowrap">
-            <i class="bi bi-arrow-counterclockwise"></i>
+
+    <!-- Filters -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end max-w-4xl">
+        <label class="block">
+            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
+                [ngModel]="filterDomaine()" (ngModelChange)="filterDomaine.set($event)">
+                <option value="ALL">Tous les domaines</option>
+                @for (d of domaines(); track d.id) {
+                <option [value]="d.id">{{ d.libelle }}</option>
+                }
+            </select>
+        </label>
+    
+        <label class="block">
+            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
+                [ngModel]="filterStatut()" (ngModelChange)="filterStatut.set($event)">
+                <option value="ALL">Tous les statuts</option>
+                @for (s of availableStatuses(); track s) {
+                <option [value]="s">{{ statusLabel(s) }}</option>
+                }
+            </select>
+        </label>
+    
+        <label class="block">
+            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
+                [ngModel]="filterAnnee()" (ngModelChange)="filterAnnee.set($event)">
+                <option value="ALL">Toutes les années</option>
+                @for (y of availableYears(); track y) {
+                <option [value]="y">{{ y }}</option>
+                }
+            </select>
+        </label>
+        <button type="button" (click)="resetFilters()" class="btn btn-outline self-start sm:self-auto whitespace-nowrap h-9 rounded-lg">
             Réinitialiser
         </button>
     </div>
-
-    <!-- Filters -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <label class="block">
-            <span class="text-xs font-medium text-sec uppercase tracking-wider">Domaine</span>
-            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
-                    [ngModel]="filterDomaine()" (ngModelChange)="filterDomaine.set($event)">
-                <option value="ALL">Tous les domaines</option>
-                @for (d of domaines(); track d.id) {
-                    <option [value]="d.id">{{ d.libelle }}</option>
-                }
-            </select>
-        </label>
-
-        <label class="block">
-            <span class="text-xs font-medium text-sec uppercase tracking-wider">Statut</span>
-            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
-                    [ngModel]="filterStatut()" (ngModelChange)="filterStatut.set($event)">
-                <option value="ALL">Tous les statuts</option>
-                @for (s of availableStatuses(); track s) {
-                    <option [value]="s">{{ statusLabel(s) }}</option>
-                }
-            </select>
-        </label>
-
-        <label class="block">
-            <span class="text-xs font-medium text-sec uppercase tracking-wider">Année</span>
-            <select class="mt-1 w-full bg-sec text-primary border myBorder rounded-md px-2 py-2 text-sm"
-                    [ngModel]="filterAnnee()" (ngModelChange)="filterAnnee.set($event)">
-                <option value="ALL">Toutes les années</option>
-                @for (y of availableYears(); track y) {
-                    <option [value]="y">{{ y }}</option>
-                }
-            </select>
-        </label>
+        
     </div>
+
 
     <!-- KPI cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -73,50 +70,53 @@
     </div>
 
     <!-- Charts row 1 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-1">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-1 max-md:w-full">
             <div class="flex items-center justify-between mb-3 gap-2">
                 <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par statut</h3>
                 <span class="text-xs text-sec whitespace-nowrap">{{ totalFormations() }} formations</span>
             </div>
-            <app-chart-canvas [config]="statusPieConfig()"></app-chart-canvas>
+            <app-chart-canvas 
+            heightClass="h-64"
+            [config]="statusPieConfig()"></app-chart-canvas>
+        </div>
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-2">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-1">
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par mois</h3>
+                <span class="text-xs text-sec">Basé sur la date de début</span>
+            </div>
+            <app-chart-canvas [config]="monthlyLineConfig()" heightClass="h-56"></app-chart-canvas>
         </div>
 
-        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-2">
+       
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-1">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par domaine</h3>
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Formateurs internes / externes</h3>
             </div>
-            <app-chart-canvas [config]="domainBarConfig()"></app-chart-canvas>
+            <app-chart-canvas 
+            heightClass="h-64"
+            [config]="formateurTypePieConfig()"></app-chart-canvas>
         </div>
     </div>
 
     <!-- Charts row 2 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-2">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm ">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-primary font-semibold text-sm sm:text-base">Participants par structure</h3>
             </div>
             <app-chart-canvas [config]="structureBarConfig()"></app-chart-canvas>
         </div>
-
-        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm lg:col-span-1">
+        <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-primary font-semibold text-sm sm:text-base">Formateurs internes / externes</h3>
+                <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par domaine</h3>
             </div>
-            <app-chart-canvas [config]="formateurTypePieConfig()"></app-chart-canvas>
+            <app-chart-canvas heightClass="h-64" [config]="domainBarConfig()"></app-chart-canvas>
         </div>
+       
     </div>
-
-    <!-- Charts row 3 -->
-    <div class="bg-sec rounded-xl border myBorder p-3 sm:p-4 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-1">
-            <h3 class="text-primary font-semibold text-sm sm:text-base">Formations par mois</h3>
-            <span class="text-xs text-sec">Basé sur la date de début</span>
-        </div>
-        <app-chart-canvas [config]="monthlyLineConfig()"
-                          heightClass="h-56 sm:h-64 lg:h-80"></app-chart-canvas>
-    </div>
-
+    <!-- row 3 -->
+   
     <!-- Search bar -->
     <div class="flex items-center">
         <div class="flex w-full sm:w-2/3 lg:w-1/3">

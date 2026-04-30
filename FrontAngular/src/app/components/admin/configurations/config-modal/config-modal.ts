@@ -29,6 +29,7 @@ export class ConfigModal implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() tabName: string = 'Item';
   @Input() showLieu = false;
+  @Input() showDescription = true;
   @Input() entity: ConfigEntity | null = null;
   @Input() loading = false;
 
@@ -98,8 +99,10 @@ export class ConfigModal implements OnInit, OnChanges {
     const value = this.form.value;
     const data: ConfigEntity = {
       libelle: value.libelle,
-      description: value.description || '',
     };
+    if (this.showDescription) {
+      data.description = value.description || '';
+    }
     if (this.showLieu) {
       data.lieu = value.lieu || '';
     }

@@ -16,10 +16,12 @@ import { Contact } from './shared/components/contact/contact';
 import { Configurations } from './components/admin/configurations/configurations';
 import { ManageUsers } from './components/admin/manage-users/manage-users';
 import { ManageFormation } from './components/user/manage-formation/manage-formation';
-import { Profile } from './shared/components/profile/profile';
+import { FormationDetails } from './components/user/manage-formation/formation-details/formation-details';
+import { Profile } from './components/user/manage-participants/profile/profile';
 import { ManageFormateur } from './components/user/manage-formateur/manage-formateur';
 import { ManageParticipants } from './components/user/manage-participants/manage-participants';
-import { Dashboard } from './components/dashboard/dashboard';
+import { Dashboard } from './components/responsable/dashboard/dashboard';
+import { Home } from './components/home/home';
 
 export const routes: Routes = [
   // Auth routes (no guard - public)
@@ -42,16 +44,19 @@ export const routes: Routes = [
     
     children: [
       
+      
       { path: 'contact', component: Contact } ,
       
       // User Dashboard
       {
         path: 'user',
         children: [
-          { path: 'dashboard', component: Dashboard },
-          { path: 'trainers', component: ManageFormateur }, // Replace with actual component
-          { path: 'trainings', component: ManageFormation }, // Replace with actual component
-          { path: 'participants', component: ManageParticipants } // Replace with actual component
+          { path: 'Home', component: Home },
+          { path: 'trainers', component: ManageFormateur }, 
+          { path: 'trainings', component: ManageFormation },
+          { path: 'trainings/:id', component: FormationDetails },
+          { path: 'participants', component: ManageParticipants },
+          { path: 'participants/:id', component: Profile }
         ],
         canActivate: [RoleGuard],
         data: { roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR'] }
@@ -61,9 +66,10 @@ export const routes: Routes = [
       {
         path: 'manager',
         children: [
-          { path: 'dashboard', component: Dashboard },
+          
+          { path: 'Home', component: Home },
           { path: 'statistics', component: Dashboard },
-          { path: 'reports', component: Testing }, // Replace with actual component
+          { path: 'reports', component: Testing }, 
         ],
         canActivate: [RoleGuard],
         data: { roles: ['RESPONSABLE', 'ADMINISTRATEUR'] }
@@ -73,12 +79,13 @@ export const routes: Routes = [
       {
         path: 'admin',
         children: [
-          { path: 'dashboard', component: Dashboard },
+          { path: 'Home', component: Home },
           { path: 'users', component: ManageUsers },
-          { path: 'domains', component: Testing }, // Replace with actual component
-          { path: 'structures', component: Testing }, // Replace with actual component
-          { path: 'profiles', component: Testing }, // Replace with actual component
-          { path: 'settings', component: Configurations } // Replace with actual component
+          { path: 'domains', component: Testing }, 
+          { path: 'structures', component: Testing }, 
+          { path: 'profiles', component: Testing },
+          { path: 'employeurs', component: Testing }, 
+          { path: 'settings', component: Configurations } 
         ],
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRATEUR'] }
@@ -86,8 +93,8 @@ export const routes: Routes = [
 
       // Default dashboard redirect
       {
-        path: 'dashboard',
-        component: Dashboard,
+        path: 'Home',
+        component: Home,
         canActivate: [AuthGuard]
       }
     ]

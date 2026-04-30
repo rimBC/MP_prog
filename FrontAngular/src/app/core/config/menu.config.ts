@@ -5,7 +5,7 @@ export const MENU_ITEMS: MenuItem[] = [
       {
         label: 'Home',
         icon: 'icons/home.svg',
-        route: '/user/dashboard',
+        route: '/user/Home',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       },
       {
@@ -35,12 +35,12 @@ export const MENU_ITEMS: MenuItem[] = [
         route: '/manager/statistics',
         roles: ['RESPONSABLE', 'ADMINISTRATEUR']
       },
-      {
-        label: 'Reports',
-        icon: 'icons/reports.svg',
-        route: '/manager/reports',
-        roles: ['RESPONSABLE', 'ADMINISTRATEUR']
-      },
+      // {
+      //   label: 'Reports',
+      //   icon: 'icons/reports.svg',
+      //   route: '/manager/reports',
+      //   roles: ['RESPONSABLE', 'ADMINISTRATEUR']
+      // },
  
       // Admin items
       {

@@ -12,20 +12,20 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ChartConfiguration } from 'chart.js';
 
-import { FormationService } from '../../core/services/formation.service';
-import { ParticipantService } from '../../core/services/participant.service';
-import { FormateurService } from '../../core/services/formateurs.service';
-import { ReferenceDataService } from '../../core/services/refrence-dat.service';
+import { FormationService } from '../../../core/services/formation.service';
+import { ParticipantService } from '../../../core/services/participant.service';
+import { FormateurService } from '../../../core/services/formateurs.service';
+import { ReferenceDataService } from '../../../core/services/refrence-dat.service';
 
-import { FormationDTO } from '../../models/formationDTO.interface';
-import { ParticipantDTO } from '../../models/participant.interface';
-import { FormateurDTO } from '../../models/formateur.interface';
-import { DomaineDTO } from '../../models/domaine.interface';
-import { StructureDTO } from '../../models/structure.interface';
+import { FormationDTO } from '../../../models/formationDTO.interface';
+import { ParticipantDTO } from '../../../models/participant.interface';
+import { FormateurDTO } from '../../../models/formateur.interface';
+import { DomaineDTO } from '../../../models/domaine.interface';
+import { StructureDTO } from '../../../models/structure.interface';
 
-import { KpiCard } from '../../shared/components/kpi-card/kpi-card';
-import { ChartCanvas } from '../../shared/components/chart-canvas/chart-canvas';
-import { MyTableLayout } from '../../shared/components/my-table-layout/my-table-layout';
+import { KpiCard } from '../kpi-card/kpi-card';
+import { ChartCanvas } from '../chart-canvas/chart-canvas';
+import { MyTableLayout } from '../../../shared/components/my-table-layout/my-table-layout';
 
 type SortKey = 'titre' | 'domaineLibelle' | 'duree' | 'budget' | 'statut' | 'nombreParticipants';
 type SortDir = 'asc' | 'desc';
@@ -399,7 +399,7 @@ export class Dashboard implements OnInit, OnDestroy {
   private statColor(idx: number): string {
     if (typeof document === 'undefined') return '#0b7cf4';
     const v = getComputedStyle(document.documentElement)
-      .getPropertyValue(`--stats-color-${idx}-text`).trim();
+      .getPropertyValue(`--bg-stats-solid-${idx}`).trim();
     return v || '#0b7cf4';
   }
 

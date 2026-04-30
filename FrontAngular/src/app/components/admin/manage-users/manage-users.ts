@@ -203,12 +203,41 @@ export class ManageUsers implements OnInit {
       ADMINISTRATEUR: 'bg-violet-100 text-violet-700',
     };
     const darkMap: { [key: string]: string } = {
-      SIMPLE_UTILISATEUR: 'bg-sky-900/40 text-sky-200',
-      RESPONSABLE: 'bg-red-900/40 text-red-200',
-      ADMINISTRATEUR: 'bg-violet-900/40 text-violet-200',
+      SIMPLE_UTILISATEUR: 'bg-sky-900/60 text-sky-200',
+      RESPONSABLE: 'bg-red-900/60 text-red-200',
+      ADMINISTRATEUR: 'bg-violet-900/60 text-violet-200',
     };
+    
     const map = this.isDark ? darkMap : lightMap;
     return map[role] || 'bg-base text-primary';
+  }
+  getStatusBadgeClass(s: boolean | undefined): string {
+    const lightMap: { [key: string]: string } = {
+      active: 'bg-emerald-100 text-emerald-700 px-5',
+      inactive: 'bg-gray-300 text-gray-700 px-3',
+    };
+    const darkMap: { [key: string]: string } = {
+active: 'bg-emerald-800/40 text-emerald-300 px-5',
+      inactive: 'bg-gray-100/20 text-gray-300 px-3',    };
+    const value=s? 'active':"inactive"
+    const map = this.isDark ? darkMap : lightMap;
+    return map[value] || 'bg-base text-primary';
+  }
+  getStatusDotBadgeClass(s: boolean | undefined): string {
+    const lightMap: { [key: string]: string } = {
+      active: 'bg-emerald-400',
+      inactive: 'bg-gray-400',
+    };
+    const darkMap: { [key: string]: string } = {
+           active: 'bg-emerald-400',
+      inactive: 'bg-gray-500',
+    };
+    const value=s? 'active':"inactive"
+    const map = this.isDark ? darkMap : lightMap;
+    return map[value] || 'bg-base text-primary';
+  }
+  getStatusDisplay(s: boolean | undefined): string {
+    if (!s) return 'Inactive'; else return "Active";
   }
 
   resetFilters(): void {

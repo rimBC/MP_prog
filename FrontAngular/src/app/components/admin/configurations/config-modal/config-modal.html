@@ -48,12 +48,14 @@
                 }
 
                 <!-- Description -->
+                @if (showDescription) {
                 <div>
                     <label class="block text-sec font-medium mb-2">Description</label>
                     <textarea formControlName="description"
                         class="w-full px-4 py-2 bg-base border myBorder rounded-lg focus:ring-2 focus:ring-(--color-btn-primary) outline-none"
                         rows="3" placeholder="Optional description"></textarea>
                 </div>
+                }
             </form>
         </div>
 

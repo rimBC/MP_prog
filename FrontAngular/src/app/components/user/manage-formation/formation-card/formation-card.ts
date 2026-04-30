@@ -15,6 +15,7 @@ export class FormationCard {
 
   @Output() deleteClicked = new EventEmitter<FormationDTO>();
   @Output() editClicked = new EventEmitter<FormationDTO>();
+  @Output() viewClicked = new EventEmitter<FormationDTO>();
 
   statuses = [
     { value: 'PLANIFIEE', label: 'Planned', badge: 'bg-primary text-primary' },
@@ -23,12 +24,18 @@ export class FormationCard {
     { value: 'ANNULEA', label: 'Cancelled', badge: 'bg-red-200 text-red-900' },
   ];
 
-  edit(): void {
+  edit(event: Event): void {
+    event.stopPropagation();
     this.editClicked.emit(this.formation);
   }
 
-  remove(): void {
+  remove(event: Event): void {
+    event.stopPropagation();
     this.deleteClicked.emit(this.formation);
+  }
+
+  view(): void {
+    this.viewClicked.emit(this.formation);
   }
 
   get statusInfo() {

@@ -1,1 +1,38 @@
-<p>unauthorized works!</p>
+<div class="min-h-screen flex items-center justify-center bg-base px-4">
+
+    <div class="bg-sec border myBorder rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+
+        <!-- Icon -->
+        <div class="mx-auto mb-6 w-16 h-16 rounded-full bg-stats-4 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-stats-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+            </svg>
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-primary mb-2">
+            Unauthorized Access
+        </h1>
+
+        <!-- Message -->
+        <p class="text-sec mb-6">
+            You don’t have permission to view this page.<br>
+            Please log in or contact an administrator.
+        </p>
+
+        <!-- Actions -->
+        <div class="flex justify-center gap-3 flex-wrap">
+
+            <button routerLink="/login" class="btn-primary px-5 py-2 rounded-full">
+                Login
+            </button>
+
+            <button routerLink="/" class="btn-outline px-5 py-2 rounded-full">
+                Go Home
+            </button>
+
+        </div>
+    </div>
+</div>

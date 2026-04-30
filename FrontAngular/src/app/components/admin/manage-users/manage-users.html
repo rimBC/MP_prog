@@ -103,8 +103,13 @@
                             {{ getRoleDisplay(user.roleName) }}
                         </span>
                     </td>
+
                     <td class="px-6 py-4">
-                        @if (user.actif) {
+                         <span [ngClass]="getStatusBadgeClass(user.actif)" class="inline-flex items-center gap-2 py-1 rounded-full text-xs font-semibold ">
+                            <span [ngClass]="getStatusDotBadgeClass(user.actif)" class="w-2 h-2 rounded-full"></span>
+                            {{ getStatusDisplay(user.actif) }}
+                                                </span>
+                        <!-- @if (user.actif) {
                         <span class="inline-flex items-center gap-2 px-5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
                             <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
                             Active
@@ -114,7 +119,7 @@
                             <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
                             Inactive
                         </span>
-                        }
+                        } -->
                     </td>
                     <td class="px-1 py-4">
                         <div class="flex gap-2 justify-end">

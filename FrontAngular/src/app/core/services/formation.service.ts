@@ -102,6 +102,40 @@ export class FormationService {
     return this.http.get<number>(`${this.apiUrl}/count/domain/${domaineId}`);
   }
 
+  /** POST /api/formations/{id}/participants/{participantId} */
+  enrollParticipant(formationId: number, participantId: number): Observable<FormationDTO> {
+    return this.http.post<FormationDTO>(`${this.apiUrl}/${formationId}/participants/${participantId}`, {}).pipe(
+      tap(updated => {
+        this._formations.update(current => {
+          const idx = current.findIndex(f => f.id === formationId);
+          if (idx === -1) return current;
+          const next = [...current];
+          next[idx] = updated;
+          return next;
+        });
+      })
+    );
+  }
+
+  /** DELETE /api/formations/{id}/participants/{participantId} */
+  removeParticipant(formationId: number, participantId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${formationId}/participants/${participantId}`).pipe(
+      tap(() => {
+        this._formations.update(current => {
+          const idx = current.findIndex(f => f.id === formationId);
+          if (idx === -1) return current;
+          const next = [...current];
+          const f = next[idx];
+          next[idx] = {
+            ...f,
+            nombreParticipants: Math.max(0, (f.nombreParticipants ?? 1) - 1),
+          };
+          return next;
+        });
+      })
+    );
+  }
+
   getCurrentFormations(): FormationDTO[] {
     return this._formations();
   }

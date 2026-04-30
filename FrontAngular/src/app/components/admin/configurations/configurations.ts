@@ -4,12 +4,14 @@ import { ReferenceDataService } from '../../../core/services/refrence-dat.servic
 import { Domaine } from '../../../models/domaine.interface';
 import { Structure } from '../../../models/structure.interface';
 import { Profil } from '../../../models/profile.interface';
+import { Employeur } from '../../../models/employeur.interface';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MyTableLayout } from '../../../shared/components/my-table-layout/my-table-layout';
 import { ConfigModal, ConfigEntity } from './config-modal/config-modal';
 
-type SettingsTab = 'domains' | 'structures' | 'profiles';
+type SettingsTab = 'domains' | 'structures' | 'profiles' | 'employeurs';
+type ConfigItem = Domaine | Structure | Profil | Employeur;
 
 @Component({
   selector: 'app-configurations',
@@ -25,6 +27,7 @@ export class Configurations implements OnInit {
   domaines: Domaine[] = [];
   structures: Structure[] = [];
   profils: Profil[] = [];
+  employeurs: Employeur[] = [];
 
   // State
   loading = false;
@@ -45,10 +48,12 @@ export class Configurations implements OnInit {
     this.referenceDataService.domaines$.subscribe(data => this.domaines = data);
     this.referenceDataService.structures$.subscribe(data => this.structures = data);
     this.referenceDataService.profils$.subscribe(data => this.profils = data);
+    this.referenceDataService.employeurs$.subscribe(data => this.employeurs = data);
 
     this.referenceDataService.loadDomaines();
     this.referenceDataService.loadStructures();
     this.referenceDataService.loadProfils();
+    this.referenceDataService.loadEmployeurs();
   }
 
   switchTab(tab: SettingsTab): void {
@@ -63,6 +68,7 @@ export class Configurations implements OnInit {
       case 'domains': return 'Domain';
       case 'structures': return 'Structure';
       case 'profiles': return 'Profile';
+      case 'employeurs': return 'Employer';
     }
   }
 
@@ -71,19 +77,33 @@ export class Configurations implements OnInit {
       case 'domains': return 'Domains';
       case 'structures': return 'Structures';
       case 'profiles': return 'Profiles';
+      case 'employeurs': return 'Employers';
     }
   }
 
-  get currentList(): (Domaine | Structure | Profil)[] {
+  get currentList(): ConfigItem[] {
     switch (this.activeTab) {
       case 'domains': return this.domaines;
       case 'structures': return this.structures;
       case 'profiles': return this.profils;
+      case 'employeurs': return this.employeurs;
     }
   }
 
   get showLieu(): boolean {
     return this.activeTab === 'structures';
+  }
+
+  get showDescription(): boolean {
+    return this.activeTab !== 'employeurs';
+  }
+
+  get isEmployeurTab(): boolean {
+    return this.activeTab === 'employeurs';
+  }
+
+  displayName(item: ConfigItem): string {
+    return this.isEmployeurTab ? (item as Employeur).nomEmployeur : (item as Domaine).libelle;
   }
 
   // ==================== MODAL HANDLERS ====================
@@ -93,8 +113,13 @@ export class Configurations implements OnInit {
     this.modalOpen = true;
   }
 
-  editEntity(entity: Domaine | Structure | Profil): void {
-    this.editingEntity = { ...entity };
+  editEntity(entity: ConfigItem): void {
+    if (this.isEmployeurTab) {
+      const e = entity as Employeur;
+      this.editingEntity = { id: e.id, libelle: e.nomEmployeur };
+    } else {
+      this.editingEntity = { ...(entity as Domaine | Structure | Profil) };
+    }
     this.modalOpen = true;
   }
 
@@ -127,34 +152,40 @@ export class Configurations implements OnInit {
   }
 
   private buildOperation(data: ConfigEntity, editingId: number | null): Observable<any> {
-    const payload: any = data;
     switch (this.activeTab) {
       case 'domains':
         return editingId
-          ? this.referenceDataService.updateDomaine(editingId, payload)
-          : this.referenceDataService.createDomaine(payload);
+          ? this.referenceDataService.updateDomaine(editingId, data as Domaine)
+          : this.referenceDataService.createDomaine(data as Domaine);
       case 'structures':
         return editingId
-          ? this.referenceDataService.updateStructure(editingId, payload)
-          : this.referenceDataService.createStructure(payload);
+          ? this.referenceDataService.updateStructure(editingId, data as Structure)
+          : this.referenceDataService.createStructure(data as Structure);
       case 'profiles':
         return editingId
-          ? this.referenceDataService.updateProfil(editingId, payload)
-          : this.referenceDataService.createProfil(payload);
+          ? this.referenceDataService.updateProfil(editingId, data as Profil)
+          : this.referenceDataService.createProfil(data as Profil);
+      case 'employeurs':
+        const employeur: Employeur = { nomEmployeur: data.libelle };
+        return editingId
+          ? this.referenceDataService.updateEmployeur(editingId, employeur)
+          : this.referenceDataService.createEmployeur(employeur);
     }
   }
 
-  deleteEntity(entity: Domaine | Structure | Profil): void {
-    if (!entity.id || !confirm(`Are you sure you want to delete '${entity.libelle}'?`)) {
+  deleteEntity(entity: ConfigItem): void {
+    const id = entity.id;
+    const name = this.displayName(entity);
+    if (!id || !confirm(`Are you sure you want to delete '${name}'?`)) {
       return;
     }
 
-    const id = entity.id;
     const op$: Observable<any> = (() => {
       switch (this.activeTab) {
         case 'domains': return this.referenceDataService.deleteDomaine(id);
         case 'structures': return this.referenceDataService.deleteStructure(id);
         case 'profiles': return this.referenceDataService.deleteProfil(id);
+        case 'employeurs': return this.referenceDataService.deleteEmployeur(id);
       }
     })();
 

@@ -1,0 +1,168 @@
+<div class="overflow-hidden">
+<div class="min-h-screen text-primary hero relative p-8 rounded-lg ">
+
+    <!-- ================= HERO ================= -->
+        <!-- decorative gradient blobs -->
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+        <div class="relative px-6 sm:px-10 py-14 md:py-20 max-w-5xl mx-auto text-center">
+
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-5">
+                <span class="block text-primary">Gestion des</span>
+                <span class="block bg-gradient-to-r from-[var(--color-primary-400)] via-[var(--color-bg-contrast)] to-[var(--color-primary-700)] bg-clip-text text-transparent">
+                    Formations Professionnelles
+                </span>
+            </h1>
+
+            <p class="text-sec text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Une plateforme moderne pour planifier, suivre et analyser vos sessions de formation —
+                Participants, Formateurs et Formations, le tout au même endroit.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <a routerLink="/user/trainings"
+                    class="btn btn-primary px-5 py-3 rounded-lg font-medium inline-flex items-center gap-2">
+                    Explorer les Formations
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a routerLink="/contact"
+                    class="px-11 py-2.5 rounded-lg font-medium border text-primary hover:bg-base transition inline-flex items-center gap-2 btn-outline ">
+                    Contacter le support
+                </a>
+            </div>
+        </div>
+        <!-- ================= ABOUT THE APP ================= -->
+        <div class="max-w-6xl mx-auto mb-10 ">
+            <div class="bg-base  p-6 md:p-8 shadow rounded-lg">
+                <h2 class="text-xl md:text-2xl font-semibold mb-3">À propos de l'application</h2>
+                <p class="text-sec text-sm md:text-base leading-relaxed mb-4">
+                    Cette application web centralise la gestion des sessions de formation professionnelle
+                    au sein du centre <span class="text-primary font-medium">Excellent Training</span>. Elle remplace les
+                    processus manuels basés sur des fichiers Excel par un outil unifié, fiable et accessible à
+                    l'ensemble des intervenants.
+                </p>
+        
+                <p class="text-sec text-sm md:text-base leading-relaxed mb-5">
+                    Selon votre rôle (Simple Utilisateur, Responsable du Centre ou Administrateur), vous pouvez
+                    gérer les formateurs, formations et participants, suivre les inscriptions et les présences,
+                    consulter des tableaux de bord statistiques et générer des rapports détaillés par structure,
+                    domaine ou période.
+                </p>
+        
+                <ul class="grid sm:grid-cols-2 gap-3 text-sm">
+                    <li class="flex items-start gap-2">
+                        <span class="mt-1 w-1.5 h-1.5 rounded-full bg-base-contrast shrink-0"></span>
+                        <span class="text-sec">CRUD complet pour formations, formateurs, participants, domaines et
+                            structures.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="mt-1 w-1.5 h-1.5 rounded-full bg-base-contrast shrink-0"></span>
+                        <span class="text-sec">Affectation des participants aux sessions et suivi de la participation.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="mt-1 w-1.5 h-1.5 rounded-full bg-base-contrast shrink-0"></span>
+                        <span class="text-sec">Statistiques par année, domaine, structure et formateur.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="mt-1 w-1.5 h-1.5 rounded-full bg-base-contrast shrink-0"></span>
+                        <span class="text-sec">Contrôle d'accès basé sur les rôles et authentification sécurisée.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+            <!-- ================= GREEN BUILDING =================
+            <div class="max-w-6xl mx-auto mb-10">
+                <div class="bg-base rounded-2xl p-6 md:p-8 shadow">
+                    <div class="flex flex-col md:flex-row md:items-start md:gap-8">
+                        
+                        <div class="flex-1">
+                            <p class="text-sec text-xs uppercase tracking-wider mb-1">Société mère</p>
+                            <h2 class="text-xl md:text-2xl font-semibold mb-3">Green Building</h2>
+                            <p class="text-sec text-sm md:text-base leading-relaxed mb-3">
+                                Green Building est une entreprise spécialisée dans la conception et la
+                                réalisation de projets durables, regroupant des équipes pluridisciplinaires en
+                                ingénierie, gestion et services. Pour répondre aux besoins de montée en
+                                compétences de ses collaborateurs, elle a fondé son centre de formation interne
+                                <span class="text-primary font-medium">Excellent Training</span>.
+                            </p>
+                            <p class="text-sec text-sm md:text-base leading-relaxed">
+                                Excellent Training organise des formations dans des domaines variés —
+                                informatique, finance, comptabilité, mécanique, etc. — animées par des
+                                formateurs internes ou externes, au profit des participants des différentes
+                                structures du groupe.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- ================= MODULES ================= -->
+            <div class="max-w-6xl mx-auto ">
+            
+                <h2 class="text-2xl font-semibold mb-6 text-primary ml-6">
+                    Accès rapide
+                </h2>
+            
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+                    <!-- FORMATIONS -->
+                    <a routerLink="/user/trainings"
+                        class="bg-base rounded-xl p-5 shadow hover:shadow-lg transition cursor-pointer block hover:-translate-y-0.5 duration-200">
+                        <h3 class="font-semibold text-lg mb-2">Formations</h3>
+                        <p class="text-sec text-sm mb-4">
+                            Gérer les sessions de formation et leur planification.
+                        </p>
+                        <span class="btn btn-primary">Voir</span>
+                    </a>
+            
+                    <!-- PARTICIPANTS -->
+                    <a routerLink="/user/participants"
+                        class="bg-base rounded-xl p-5 shadow hover:shadow-lg transition cursor-pointer block hover:-translate-y-0.5 duration-200">
+                        <h3 class="font-semibold text-lg mb-2">Participants</h3>
+                        <p class="text-sec text-sm mb-4">
+                            Suivre les inscriptions et les profils.
+                        </p>
+                        <span class="btn btn-primary">Voir</span>
+                    </a>
+            
+                    <!-- FORMATEURS -->
+                    <a routerLink="/user/trainers"
+                        class="bg-base rounded-xl p-5 shadow hover:shadow-lg transition cursor-pointer block hover:-translate-y-0.5 duration-200">
+                        <h3 class="font-semibold text-lg mb-2">Formateurs</h3>
+                        <p class="text-sec text-sm mb-4">
+                            Gérer les formateurs internes et externes.
+                        </p>
+                        <span class="btn btn-primary">Voir</span>
+                    </a>
+            
+                    <!-- SUPPORT -->
+                    <a routerLink="/contact"
+                        class="bg-base rounded-xl p-5 shadow hover:shadow-lg transition cursor-pointer block hover:-translate-y-0.5 duration-200">
+                        <h3 class="font-semibold text-lg mb-2">Support</h3>
+                        <p class="text-sec text-sm mb-4">
+                            Contacter le support informatique.
+                        </p>
+                        <span class="btn btn-outline">Voir</span>
+                    </a>
+            
+            
+                </div>
+            </div>
+            
+            
+            <!-- ================= FOOTER INFO ================= -->
+            <div class="text-center mt-16 text-sec text-sm">
+                © 2026 Excellent Training • Green Building
+            </div>
+            
+</div>
+
+    
+
+
+</div>
+
+
+   

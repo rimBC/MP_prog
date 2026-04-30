@@ -12,7 +12,6 @@ export type KpiTone = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 export class KpiCard {
   @Input() label: string = '';
   @Input() value: string | number = 0;
-  @Input() icon: string = 'bi-graph-up';
   @Input() tone: KpiTone = 1;
   @Input() hint?: string;
 }

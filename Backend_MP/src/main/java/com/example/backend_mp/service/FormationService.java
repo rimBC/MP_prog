@@ -24,6 +24,7 @@ public class FormationService {
     private final FormateurRepository formateurRepository;
     private final DomaineRepository DomaineRepository;
     private final ParticipantRepository participantRepository;
+    private final ParticipantFormationRepository participantFormationRepository;
     
     /**
      * Get all formations
@@ -201,6 +202,48 @@ public class FormationService {
         log.debug("Counting formations for domain: {}", domaineId);
         return formationRepository.countByDomaineId(domaineId);
     }
+
+    /**
+     * Enroll a participant in a formation
+     */
+    @Transactional
+    public FormationDTO enrollParticipant(Long formationId, Long participantId) {
+        log.info("Enrolling participant {} in formation {}", participantId, formationId);
+
+        Formation formation = formationRepository.findById(formationId)
+            .orElseThrow(() -> new IllegalArgumentException("Formation not found with ID: " + formationId));
+        Participant participant = participantRepository.findById(participantId)
+            .orElseThrow(() -> new IllegalArgumentException("Participant not found with ID: " + participantId));
+
+        if (participantFormationRepository.isEnrolled(participantId, formationId)) {
+            log.info("Participant {} already enrolled in formation {}", participantId, formationId);
+            return convertToDTO(formation);
+        }
+
+        ParticipantFormation enrollment = ParticipantFormation.builder()
+            .id(new ParticipantFormation.ParticipantFormationId(participantId, formationId))
+            .participant(participant)
+            .formation(formation)
+            .build();
+
+        participantFormationRepository.save(enrollment);
+        return convertToDTO(formationRepository.findById(formationId).orElse(formation));
+    }
+
+    /**
+     * Remove a participant from a formation
+     */
+    @Transactional
+    public void removeParticipant(Long formationId, Long participantId) {
+        log.info("Removing participant {} from formation {}", participantId, formationId);
+
+        ParticipantFormation enrollment = participantFormationRepository
+            .findByParticipantAndFormation(participantId, formationId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Participant " + participantId + " is not enrolled in formation " + formationId));
+
+        participantFormationRepository.delete(enrollment);
+    }
     
     /**
      * Convert Formation entity to DTO
@@ -221,6 +264,10 @@ public class FormationService {
             .formateurNom(formation.getFormateur().getNom() + " " + formation.getFormateur().getPrenom())
             .domaineId(formation.getDomaine().getId())
             .domaineLibelle(formation.getDomaine().getLibelle())
+            .participantIds(formation.getParticipantFormations()
+        .stream()
+        .map(pf -> pf.getParticipant().getId())
+        .collect(Collectors.toSet()))
             .nombreParticipants((int) formation.getParticipantFormations()
         .stream()
         .map(ParticipantFormation::getParticipant)
