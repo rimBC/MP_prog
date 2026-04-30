@@ -310,7 +310,7 @@
         
     </app-my-table-layout>
 <!-- Cartes d'information sur les départements -->
-<div class="mt-8">
+<!-- <div class="mt-8 w-full max-w-full">
     <div class="flex items-center justify-between mb-3">
         <h3 class="text-lg font-bold text-primary">Départements</h3>
         <div class="flex gap-2">
@@ -331,7 +331,7 @@
         </div>
     </div>
 
-    <div #deptScroller class="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x">
+    <div #deptScroller class="flex w-full max-w-full gap-4 overflow-x-auto scroll-smooth pb-2 snap-x">
         @for (s of structures(); track s.id) {
         <div class="shrink-0 w-64 bg-sec p-4 rounded-lg border myBorder snap-start">
             <h3 class="font-bold text-primary mb-1 text-sm truncate">{{ s.libelle }}</h3>
@@ -344,7 +344,7 @@
         <p class="text-sec text-sm">Aucun département disponible</p>
         }
     </div>
-</div>
+</div> -->
 
     <!-- Add/Edit Modal -->
     <app-participant-modal
