@@ -1,14 +1,14 @@
-# Training Management System - Complete Setup & Testing Guide
+# Excellent Training : Training Management System - Complete Setup & Testing Guide
 
-## 📋 Project Overview
+## Project Overview
 
-A complete web application for managing professional training sessions at "Excellent Training" center. Built with Spring Boot 3.x backend and Angular 17+ frontend.
+A complete web application for managing professional training sessions at "Excellent Training" center. Built with Spring Boot 4.0.5 backend and Angular 17+ frontend.
 
 **Stack**: Spring Boot + PostgreSQL + Angular + Tailwind CSS
 
 ---
 
-## 🚀 Quick Start (5 minutes)
+## Quick Start (5 minutes)
 
 ### Prerequisites
 - Java 17+
@@ -25,26 +25,26 @@ A complete web application for managing professional training sessions at "Excel
 # Connect to PostgreSQL
 psql -U postgres
 
-# Create database and user
-CREATE DATABASE training_db;
-CREATE USER training_user WITH PASSWORD 'training_password';
-ALTER ROLE training_user SET client_encoding TO 'utf8';
-ALTER ROLE training_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE training_user SET default_transaction_deferrable TO on;
-ALTER ROLE training_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE training_db TO training_user;
+# Create database and user (you can replace postgres with your username, MP with your database name and the password and then configure the backend. see 2. bellow)
+CREATE DATABASE MP;
+CREATE USER postgres WITH PASSWORD '123123';
+ALTER ROLE postgres SET client_encoding TO 'utf8';
+ALTER ROLE postgres SET default_transaction_isolation TO 'read committed';
+ALTER ROLE postgres SET default_transaction_deferrable TO on;
+ALTER ROLE postgres SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE MP TO postgres;
 \q
 ```
 
 #### 2. Clone and Configure Backend
 
 ```bash
-cd /home/claude/training-app/backend
-
 # Update application.properties with your database credentials
+# you can replace postgres, MP and the password with yours
 # File: src/main/resources/application.properties
-# spring.datasource.username=training_user
-# spring.datasource.password=training_password
+#spring.datasource.url=jdbc:postgresql://localhost:5432/MP
+# spring.datasource.username=postgres
+# spring.datasource.password=123123
 ```
 
 #### 3. Build Backend
@@ -63,12 +63,33 @@ Backend runs on: **http://localhost:8080/api**
 Swagger UI: **http://localhost:8080/api/swagger-ui.html**
 
 ---
+## Architecture Backend
+
+```
+training-app/
+├── backend/
+│   ├── src/main/java/com/excellenttraining/
+│   │   ├── domain/
+│   │   │   ├── entity/           # JPA Entities
+│   │   │   ├── dto/              # Data Transfer Objects
+│   │   │   └── repository/       # Spring Data Repositories
+│   │   ├── service/              # Business Logic Services
+│   │   ├── web/controller/       # REST Controllers
+│   │   ├── security/             # Security Configuration & JWT
+│   │   └── TrainingManagementApplication.java
+│   ├── src/main/resources/
+│   │   └── application.properties
+│   └── pom.xml
+├── frontend/                      # Angular application
+├── docs/                          # Documentation
+└── README.md
+```
 
 ### Frontend Setup
 
 The frontend is an Angular 21 single-page application that consumes the Spring Boot REST API.
 
-#### 1. Install dependencies
+#### 1. Install dependencies !!
 
 ```bash
 cd FrontAngular
@@ -78,8 +99,7 @@ npm install
 #### 2. Run the dev server
 
 ```bash
-npm start
-# or: ng serve
+ng serve
 ```
 
 App runs on: **http://localhost:4200**
@@ -92,11 +112,6 @@ ng build
 
 Artifacts are emitted to `dist/`.
 
-#### 4. Backend URL configuration
-
-The API base URL is read from `src/environments/` and from `src/app/core/config/settings.config.ts`. Update those if the backend is not on `http://localhost:8080`.
-
----
 
 ## 🎨 Frontend Overview
 
@@ -106,9 +121,8 @@ The API base URL is read from `src/environments/` and from `src/app/core/config/
 - **Tailwind CSS 4** for styling
 - **Chart.js 4** for the statistics dashboard
 - **RxJS 7.8** for HTTP and reactive flows
-- **Vitest** for unit testing
 
-### Application Structure
+### Architecture Frontend
 
 ```
 FrontAngular/src/app/
@@ -161,7 +175,7 @@ The router enforces three role-based zones via `RoleGuard` (`src/app/app.routes.
 
 ---
 
-## 🗄️ Database Setup
+## Database Setup
 
 ### Initialize Database Schema
 
@@ -343,12 +357,14 @@ END;
 The full seed script lives at `Backend_MP/src/main/resources/seed.sql`. It is **idempotent** (TRUNCATE + RESTART IDENTITY) and produces a multi-year dataset spanning **2021 → 2026 (Q2)** so the statistics dashboards have meaningful history.
 
 **Volumes produced:**
-- 4 roles, 10 domaines, 10 profils, 8 structures, 8 employeurs
+- 3 roles, 10 domaines, 10 profils, 8 structures, 8 employeurs
 - 25 formateurs (15 internes + 10 externes)
-- 15 utilisateurs (mix of admin / gestionnaire / formateur / consultation, some inactive)
+- 15 utilisateurs
 - 100 participants (generated via `generate_series`)
-- ~90 formations spread across 5+ years, with realistic statuses (`TERMINEE`, `EN_COURS`, `PLANIFIEE`, `ANNULEE`)
+- ~90 formations spread across 5+ years, with realistic statuses (`COMPLETEE`, `EN_COURS`, `PLANIFIEE`, `ANNULEE`)
 - ~720 enrollments in `participant_formation` with statuses `PRESENT` / `ABSENT` / `ANNULE` / `INSCRIT`
+<details>
+  <summary> Click to view the full SQL Script</summary>
 
 ```sql
 -- =============================================================================
@@ -371,14 +387,17 @@ TRUNCATE TABLE
     public.employeur
 RESTART IDENTITY CASCADE;
 
+-- =============================================================================
 -- 1. ROLES
+-- =============================================================================
 INSERT INTO public.role (nom, description) VALUES
-('ADMIN',         'Administrateur du système'),
-('GESTIONNAIRE',  'Gestionnaire des formations'),
-('FORMATEUR',     'Formateur interne'),
-('CONSULTATION',  'Accès en lecture seule');
+('SIMPLE_UTILISATEUR', 'Administrateur du système'),
+('ADMINISTRATEUR', 'Administrateur du système'),
+('RESPONSABLE',    'Responsable des formations');
 
+-- =============================================================================
 -- 2. DOMAINES
+-- =============================================================================
 INSERT INTO public.domaine (libelle, description) VALUES
 ('Informatique',              'Développement, infrastructure, cybersécurité'),
 ('Management',                'Leadership et gestion d''équipe'),
@@ -391,7 +410,9 @@ INSERT INTO public.domaine (libelle, description) VALUES
 ('Juridique',                 'Droit des affaires, contrats'),
 ('Soft Skills',               'Communication, négociation, gestion du temps');
 
+-- =============================================================================
 -- 3. PROFILS
+-- =============================================================================
 INSERT INTO public.profil (libelle, description) VALUES
 ('Ingénieur',              'Profil ingénieur'),
 ('Technicien supérieur',   'Profil technique'),
@@ -404,7 +425,9 @@ INSERT INTO public.profil (libelle, description) VALUES
 ('Chef de projet',         'Pilotage de projets'),
 ('Ouvrier qualifié',       'Atelier / production');
 
+-- =============================================================================
 -- 4. STRUCTURES
+-- =============================================================================
 INSERT INTO public.structure (libelle, description, lieu) VALUES
 ('DSI',                'Direction des Systèmes d''Information', 'Tunis'),
 ('DRH',                'Direction des Ressources Humaines',     'Tunis'),
@@ -415,13 +438,22 @@ INSERT INTO public.structure (libelle, description, lieu) VALUES
 ('Direction Générale', 'Direction Générale',                    'Tunis'),
 ('R&D',                'Recherche et Développement',            'Tunis');
 
+-- =============================================================================
 -- 5. EMPLOYEURS (organismes externes)
+-- =============================================================================
 INSERT INTO public.employeur (nomemployeur) VALUES
-('ITCenter Tunisie'), ('Cegos Tunisie'), ('Demos'), ('IFPC'),
-('Indépendant'), ('Centre des Études Juridiques'),
-('ISGB Formation'), ('ENIT Consulting');
+('ITCenter Tunisie'),
+('Cegos Tunisie'),
+('Demos'),
+('IFPC'),
+('Indépendant'),
+('Centre des Études Juridiques'),
+('ISGB Formation'),
+('ENIT Consulting');
 
+-- =============================================================================
 -- 6. FORMATEURS (15 internes + 10 externes)
+-- =============================================================================
 INSERT INTO public.formateur (nom, prenom, email, tel, type, id_employeur, specialite, bio) VALUES
 -- Internes (id_employeur NULL)
 ('Ben Salah',  'Mohamed', 'mohamed.bensalah@entreprise.tn',  '+216 71 234 001', 'INTERNE', NULL, 'Java / Spring Boot',         'Tech lead backend, 12 ans d''expérience.'),
@@ -451,25 +483,9 @@ INSERT INTO public.formateur (nom, prenom, email, tel, type, id_employeur, speci
 ('Khlifi',     'Hamza',   'hamza.khlifi@itcenter.tn',        '+216 71 555 009', 'EXTERNE', 1,    'Cybersécurité offensive',    'Pentester certifié OSCP.'),
 ('Mahmoudi',   'Yosra',   'yosra.mahmoudi@cegos.tn',         '+216 71 555 010', 'EXTERNE', 2,    'Gestion du changement',      'Consultante change management.');
 
--- 7. UTILISATEURS  (bcrypt hash below = "password123")
-INSERT INTO public.utilisateur (login, password, id_role, actif, date_creation, date_modification) VALUES
-('admin',         '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 1, true, '2021-01-01 08:00:00', '2025-01-15 10:00:00'),
-('gestionnaire1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 2, true, '2021-01-10 08:00:00', '2024-06-20 14:30:00'),
-('gestionnaire2', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 2, true, '2022-03-01 09:00:00', '2025-02-10 09:15:00'),
-('m.bensalah',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2021-02-01 08:00:00', '2024-09-01 11:00:00'),
-('s.trabelsi',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2021-02-01 08:00:00', '2024-09-01 11:00:00'),
-('k.bouazizi',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2021-04-15 08:00:00', '2025-01-05 16:20:00'),
-('a.hamdi',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2021-05-10 08:00:00', '2024-12-01 10:00:00'),
-('s.mejri',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2021-06-01 08:00:00', '2025-03-12 13:45:00'),
-('n.khelifi',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2022-01-15 08:00:00', '2024-08-22 09:30:00'),
-('a.bouzid',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 3, true, '2022-04-20 08:00:00', '2025-02-28 11:10:00'),
-('rh.lecture',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 4, true, '2022-06-01 09:00:00', '2025-01-20 14:00:00'),
-('audit.lecture', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 4, true, '2023-02-15 09:00:00', '2025-03-01 09:00:00'),
-('ancien.user',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 2, false,'2021-03-01 08:00:00', '2023-11-15 17:00:00'),
-('stagiaire.it',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 4, true, '2024-09-01 08:00:00', '2025-04-01 10:00:00'),
-('dg.read',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 4, true, '2023-01-10 09:00:00', '2025-02-15 08:30:00');
-
--- 8. PARTICIPANTS (100 personnes — generate_series)
+-- =============================================================================
+-- 7. PARTICIPANTS (100 personnes)
+-- =============================================================================
 INSERT INTO public.participant (nom, prenom, email, tel, id_structure, id_profil, date_embauche, actif)
 SELECT
     (ARRAY['Ben Salah','Trabelsi','Bouazizi','Hamdi','Mejri','Khelifi','Bouzid','Gharbi','Sassi','Jouini',
@@ -488,7 +504,9 @@ SELECT
     (gs % 25) <> 0
 FROM generate_series(1, 100) AS gs;
 
--- 9. FORMATIONS (~90 sessions, étalées sur 2021-01 -> 2026-06)
+-- =============================================================================
+-- 8. FORMATIONS (~90 sessions, étalées sur 2021-01 -> 2026-06)
+-- =============================================================================
 WITH titres AS (
     SELECT * FROM (VALUES
         (1,  'Spring Boot avancé',                          1),
@@ -560,7 +578,7 @@ SELECT
     (s.date_debut + (s.duree - 1) * INTERVAL '1 day')::date,
     (s.date_debut - INTERVAL '45 days')::timestamp,
     CASE
-        WHEN s.date_debut + (s.duree - 1) * INTERVAL '1 day' < DATE '2026-04-29' THEN 'TERMINEE'
+        WHEN s.date_debut + (s.duree - 1) * INTERVAL '1 day' < DATE '2026-04-29' THEN 'COMPLETEE'
         WHEN s.date_debut <= DATE '2026-04-29'                                    THEN 'EN_COURS'
         ELSE 'PLANIFIEE'
     END,
@@ -568,12 +586,15 @@ SELECT
 FROM sessions s
 JOIN titres t ON t.idx = s.titre_idx;
 
--- Quelques formations annulées pour la stat "statut"
+-- Bonus: quelques formations annulées pour la stat "statut"
 UPDATE public.formation
 SET statut = 'ANNULEE'
 WHERE id IN (7, 23, 41, 58, 71);
 
--- 10. PARTICIPANT_FORMATION (~720 inscriptions, ~8/formation)
+-- =============================================================================
+-- 9. PARTICIPANT_FORMATION (inscriptions)
+-- =============================================================================
+-- Sélection pseudo-aléatoire (~8%) -> ~720 inscriptions, ~8/formation en moyenne.
 INSERT INTO public.participant_formation
     (id_participant, id_formation, date_inscription, statut_participation)
 SELECT
@@ -591,24 +612,19 @@ CROSS JOIN public.participant p
 WHERE ((p.id * 7 + f.id * 13 + (p.id_structure * 11)) % 100) < 9
   AND p.actif = true;
 
--- 11. Synchronisation des séquences
+-- =============================================================================
+-- 10. Synchronisation des séquences (sécurité au cas où)
+-- =============================================================================
 SELECT setval(pg_get_serial_sequence('public.role',         'id'), COALESCE(MAX(id),1)) FROM public.role;
 SELECT setval(pg_get_serial_sequence('public.domaine',      'id'), COALESCE(MAX(id),1)) FROM public.domaine;
 SELECT setval(pg_get_serial_sequence('public.profil',       'id'), COALESCE(MAX(id),1)) FROM public.profil;
 SELECT setval(pg_get_serial_sequence('public.structure',    'id'), COALESCE(MAX(id),1)) FROM public.structure;
 SELECT setval(pg_get_serial_sequence('public.employeur',    'id'), COALESCE(MAX(id),1)) FROM public.employeur;
 SELECT setval(pg_get_serial_sequence('public.formateur',    'id'), COALESCE(MAX(id),1)) FROM public.formateur;
-SELECT setval(pg_get_serial_sequence('public.utilisateur',  'id'), COALESCE(MAX(id),1)) FROM public.utilisateur;
 SELECT setval(pg_get_serial_sequence('public.participant',  'id'), COALESCE(MAX(id),1)) FROM public.participant;
 SELECT setval(pg_get_serial_sequence('public.formation',    'id'), COALESCE(MAX(id),1)) FROM public.formation;
 
 COMMIT;
-```
-
-**Run the schema and seed scripts:**
-```bash
-psql -U training_user -d training_db -f schema.sql
-psql -U training_user -d training_db -f Backend_MP/src/main/resources/seed.sql
 ```
 
 **Verify volumes:**
@@ -625,9 +641,11 @@ UNION ALL SELECT 'formation',            COUNT(*) FROM public.formation
 UNION ALL SELECT 'participant_formation',COUNT(*) FROM public.participant_formation;
 ```
 
----
 
-## 🧪 Testing the Application
+</details>
+
+---
+## Testing the Application
 
 ### Using Postman
 
@@ -776,76 +794,20 @@ curl -X GET http://localhost:8080/api/formateurs/type/interne \
 
 ## 🔒 Security Features Implemented
 
-✅ **JWT Authentication**: Token-based stateless authentication
-✅ **Password Encryption**: BCrypt for secure password hashing
-✅ **Role-Based Access Control (RBAC)**: Three-tier role system
-✅ **Method-Level Security**: @PreAuthorize annotations
-✅ **CORS Configuration**: Configurable cross-origin requests
-✅ **CSRF Protection**: Built-in Spring Security CSRF tokens
-✅ **Input Validation**: Bean validation and custom validators
-✅ **Exception Handling**: Global exception handler
+**JWT Authentication**: Token-based stateless authentication
+**Password Encryption**: BCrypt for secure password hashing
+**Role-Based Access Control (RBAC)**: Three-tier role system
+**Method-Level Security**: @PreAuthorize annotations
+**CORS Configuration**: Configurable cross-origin requests
+**CSRF Protection**: Built-in Spring Security CSRF tokens
+**Input Validation**: Bean validation and custom validators
+**Exception Handling**: Global exception handler
 
 ---
 
-## 📊 Architecture Overview
 
-```
-training-app/
-├── backend/
-│   ├── src/main/java/com/excellenttraining/
-│   │   ├── domain/
-│   │   │   ├── entity/           # JPA Entities
-│   │   │   ├── dto/              # Data Transfer Objects
-│   │   │   └── repository/       # Spring Data Repositories
-│   │   ├── service/              # Business Logic Services
-│   │   ├── web/controller/       # REST Controllers
-│   │   ├── security/             # Security Configuration & JWT
-│   │   └── TrainingManagementApplication.java
-│   ├── src/main/resources/
-│   │   └── application.properties
-│   └── pom.xml
-├── frontend/                      # Angular application
-├── docs/                          # Documentation
-└── README.md
-```
 
----
 
-## 📝 Database Schema
-
-### Entity Relationships
-
-```
-Utilisateur (User)
-├── role: Role (Many-to-One)
-└── Many users per role
-
-Role
-├── Simple Utilisateur
-├── Responsable
-└── Administrateur
-
-Formation (Training)
-├── formateur: Formateur (Many-to-One)
-├── domaine: Domaine (Many-to-One)
-├── participants: Set<Participant> (Many-to-Many via ParticipantFormation)
-
-Participant (Trainee)
-├── structure: Structure (Many-to-One)
-├── profil: Profil (Many-to-One)
-├── formations: Set<Formation> (Many-to-Many)
-
-Formateur (Trainer)
-├── employeur: Employeur (Many-to-One, nullable for internal)
-├── type: "interne" or "externe"
-
-Domaine (Training Field)
-Profil (Job Profile)
-Structure (Organization)
-Employeur (External Employer)
-```
-
----
 
 ## 🔑 Default Test Credentials
 
@@ -854,22 +816,6 @@ Employeur (External Employer)
 | admin | admin123 | ADMINISTRATEUR | Full system access |
 | user1 | password123 | SIMPLE_UTILISATEUR | Basic CRUD operations |
 | manager1 | password123 | RESPONSABLE | Reporting & Statistics |
-
----
-
-## ✅ Testing Checklist
-
-- [ ] Database connection successful
-- [ ] Backend starts without errors
-- [ ] Login endpoint returns valid JWT token
-- [ ] Token can be used in Authorization header
-- [ ] Create formateur returns 201 with ID
-- [ ] Get all formateurs returns 200 with list
-- [ ] Update formateur returns 200 with updated data
-- [ ] Delete formateur returns 204 No Content
-- [ ] Unauthorized requests return 401
-- [ ] Forbidden requests return 403
-- [ ] Invalid role restrictions enforced
 
 ---
 
@@ -912,11 +858,11 @@ app.cors.allowed-origins=http://localhost:4200,http://localhost:3000
 
 ---
 
-## 📚 API Endpoints Reference
+## API Endpoints Reference
 
 Complete reference generated from the backend OpenAPI spec (`/v3/api-docs`). All endpoints are prefixed with `http://localhost:8080` and — except `/api/auth/**` — require a `Bearer <jwt>` header.
 
-### 🔐 Authentication (`/api/auth`)
+### Authentication (`/api/auth`)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -926,7 +872,7 @@ Complete reference generated from the backend OpenAPI spec (`/v3/api-docs`). All
 | GET    | `/api/auth/check-availability/{login}`  | Check if a login is available |
 | GET    | `/api/auth/health`                      | Service health probe |
 
-### 👥 User Management (`/api/utilisateurs`) — *Admin only*
+### User Management (`/api/utilisateurs`) — *Admin only*
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -943,7 +889,7 @@ Complete reference generated from the backend OpenAPI spec (`/v3/api-docs`). All
 | POST   | `/api/utilisateurs/{id}/reset-password`        | Reset password (body: `{ "password": "..." }`) |
 | PUT    | `/api/utilisateurs/{userId}/role/{roleId}`     | Change user role |
 
-### 🎓 Formations (`/api/formations`) — *Training Sessions*
+### Formations (`/api/formations`) — *Training Sessions*
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -961,7 +907,7 @@ Complete reference generated from the backend OpenAPI spec (`/v3/api-docs`). All
 | POST   | `/api/formations/{id}/participants/{participantId}`     | Enroll a participant |
 | DELETE | `/api/formations/{id}/participants/{participantId}`     | Remove a participant |
 
-### 👨‍🏫 Formateurs (`/api/formateurs`) — *Trainers*
+### Formateurs (`/api/formateurs`) — *Trainers*
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -972,7 +918,7 @@ Complete reference generated from the backend OpenAPI spec (`/v3/api-docs`). All
 | DELETE | `/api/formateurs/{id}`             | Delete trainer |
 | GET    | `/api/formateurs/type/{type}`      | Filter by type (`interne` / `externe`) |
 
-### 🧑‍🎓 Participants (`/api/participants`) — *Trainees*
+### Participants (`/api/participants`) — *Trainees*
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -989,7 +935,7 @@ Complete reference generated from the backend OpenAPI spec (`/v3/api-docs`). All
 | GET    | `/api/participants/formation/{formationId}`        | List participants enrolled in a formation |
 | GET    | `/api/participants/count/structure/{structureId}`  | Count participants by structure |
 
-### 🗂️ Reference Data (`/api/reference/**`)
+### Reference Data (`/api/reference/**`)
 
 CRUD endpoints for the four lookup tables. All four resources (`structures`, `profils`, `domaines`, `employeurs`) expose the same shape:
 
@@ -1003,7 +949,7 @@ CRUD endpoints for the four lookup tables. All four resources (`structures`, `pr
 
 Where `{resource}` is one of `structures`, `profils`, `domaines`, `employeurs`.
 
-### 📦 Core DTOs
+###Core DTOs
 
 | DTO              | Notable fields |
 |------------------|----------------|
@@ -1023,7 +969,7 @@ Where `{resource}` is one of `structures`, `profils`, `domaines`, `employeurs`.
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Docker Setup
 
@@ -1044,23 +990,13 @@ docker run -p 8080:8080 -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/train
 
 ---
 
-## 📖 Additional Resources
+## Additional Resources
 
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Spring Security JWT Guide](https://spring.io/blog/2015/01/12/the-login-page-configure-it-or-protect-it-and-why)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Swagger/OpenAPI Docs](http://localhost:8080/api/swagger-ui.html)
 
----
-
-## 📞 Support
-
-For issues or questions:
-1. Check logs in console
-2. Review application.properties configuration
-3. Verify database setup
-4. Test endpoints with Postman
-5. Check JWT token validity
 
 ---
 
