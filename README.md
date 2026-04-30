@@ -651,6 +651,53 @@ UNION ALL SELECT 'participant_formation',COUNT(*) FROM public.participant_format
 
 #### 1. Login and Get Token
 
+**Mandatory** 
+### 1. Create the admin user
+
+**Request:**
+```
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "login": "admin",
+  "password": "admin123",
+  "passwordConfirm": "admin123",
+  "roleId": 1
+}
+```
+
+### 2. Create the basic user
+
+**Request:**
+```
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "login": "user1",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "roleId": 3
+}
+```
+
+### 3. Create the manager user
+
+**Request:**
+```
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "login": "manager1",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "roleId": 2
+}
+```
+
+
 **Request:**
 ```
 POST http://localhost:8080/api/auth/login
@@ -815,51 +862,6 @@ If your database does not yet contain the test users (e.g. you skipped `seed.sql
 
 > The signup endpoint takes a numeric `roleId` that must match a row in the `role` table. After running `schema.sql`, insert the roles first (or run `seed.sql` which populates them):
 > `1 = ADMINISTRATEUR`, `2 = RESPONSABLE`, `3 = SIMPLE_UTILISATEUR`. Adjust the IDs below if your `role` table uses different values.
-
-### 1. Create the admin user
-
-**Request:**
-```
-POST http://localhost:8080/api/auth/signup
-Content-Type: application/json
-
-{
-  "login": "admin",
-  "password": "admin123",
-  "passwordConfirm": "admin123",
-  "roleId": 1
-}
-```
-
-### 2. Create the basic user
-
-**Request:**
-```
-POST http://localhost:8080/api/auth/signup
-Content-Type: application/json
-
-{
-  "login": "user1",
-  "password": "password123",
-  "passwordConfirm": "password123",
-  "roleId": 3
-}
-```
-
-### 3. Create the manager user
-
-**Request:**
-```
-POST http://localhost:8080/api/auth/signup
-Content-Type: application/json
-
-{
-  "login": "manager1",
-  "password": "password123",
-  "passwordConfirm": "password123",
-  "roleId": 2
-}
-```
 
 ### Postman setup tips
 
