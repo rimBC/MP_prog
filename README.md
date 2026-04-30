@@ -113,7 +113,7 @@ ng build
 Artifacts are emitted to `dist/`.
 
 
-## 🎨 Frontend Overview
+## Frontend Overview
 
 ### Stack
 - **Angular 21** (standalone components, signals, new control flow)
