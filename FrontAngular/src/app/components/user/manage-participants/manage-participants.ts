@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { ParticipantDTO, ParticipantService } from '../../../core/services/participant.service';
 import { FormationService } from '../../../core/services/formation.service';
 import { FormsModule } from '@angular/forms';
@@ -69,6 +69,35 @@ export class ManageParticipants implements OnInit {
       return true;
     });
   });
+
+  // Pagination
+  readonly pageSize = signal(10);
+  readonly pageIndex = signal(0);
+
+  readonly pagedParticipants = computed<ParticipantDTO[]>(() => {
+    const list = this.filteredParticipants();
+    const size = this.pageSize();
+    const start = this.pageIndex() * size;
+    return list.slice(start, start + size);
+  });
+
+  readonly totalPages = computed<number>(() =>
+    Math.max(1, Math.ceil(this.filteredParticipants().length / this.pageSize()))
+  );
+
+  constructor() {
+    // Reset to first page when filters change.
+    effect(() => {
+      this.filterStructure(); this.filterProfil(); this.filterStatus(); this.searchText();
+      this.pageIndex.set(0);
+    });
+    // Clamp page index when the filtered list shrinks.
+    effect(() => {
+      const total = this.filteredParticipants().length;
+      const lastPage = Math.max(0, Math.ceil(total / this.pageSize()) - 1);
+      if (this.pageIndex() > lastPage) this.pageIndex.set(lastPage);
+    });
+  }
 
   ngOnInit(): void {
     this.participantService.loadParticipants();

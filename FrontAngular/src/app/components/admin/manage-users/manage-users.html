@@ -3,12 +3,12 @@
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold text-primary mb-2">User Management</h1>
-            <p class="text-sec">Manage users, roles, and account status</p>
+            <h1 class="text-4xl font-bold text-primary mb-2">Gestion des Utilisateurs</h1>
+            <p class="text-sec">Gérer les utilisateurs, les rôles et le statut des comptes</p>
         </div>
         <div class="flex gap-4 items-center">
             <button (click)="openCreateModal()" class="btn btn-primary font-medium rounded-lg transition text-sm">
-                ✚ Add User
+                ✚ Ajouter un Utilisateur
             </button>
         </div>
     </div>
@@ -27,18 +27,22 @@
 
     <!-- Filters -->
     <div class="bg-sec rounded-lg shadow-lg p-4 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 items-center">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-12">
 
-            <div class="flex justify-between items-center text-sec md:col-span-2 lg:col-span-3">
-                <div class="flex flex-col min-w-40">
-                    <h2 class="text-xl font-bold text-primary">Filters</h2>
-                    <p class="text-sec text-sm">
-                        Showing {{ filteredUsers().length }} of {{ utilisateurs().length }} users
-                    </p>
-                </div>
-                <div class="flex text-sec h-11">
-                    <div
-                        class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12">
+            <!-- Header: title + count (hidden below lg) -->
+            <div class="hidden lg:flex flex-col shrink-0">
+                <h2 class="text-xl font-bold text-primary">Filtres</h2>
+                <p class="text-sec text-sm whitespace-nowrap">
+                    Affiche {{ filteredUsers().length }} de {{ utilisateurs().length }} utilisateurs
+                </p>
+            </div>
+
+            <!-- Filter controls grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 flex-1 min-w-0">
+
+                <!-- Search -->
+                <div class="flex h-11 w-full min-w-0 sm:col-span-2">
+                    <div class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12 shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-3.5">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -46,33 +50,30 @@
                         </svg>
                     </div>
                     <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
-                        placeholder="Search by username"
-                        class="px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
+                        placeholder="Rechercher par nom d'utilisateur"
+                        class="flex-1 min-w-0 px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
                 </div>
-            </div>
 
-            <div>
+                <!-- Rôle -->
                 <select [ngModel]="filterRole()" (ngModelChange)="filterRole.set($event)"
-                    class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
-                    <option value="ALL">All Roles</option>
+                    class="w-full h-11 px-4 py-2 bg-base border myBorder rounded-lg outline-none min-w-0">
+                    <option value="ALL">Tous les rôles</option>
                     @for (role of roles(); track role.id) {
                     <option [value]="role.nom">{{ getRoleDisplay(role.nom) }}</option>
                     }
                 </select>
-            </div>
 
-            <div>
+                <!-- Statut -->
                 <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)"
-                    class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
-                    <option value="ALL">All Status</option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
+                    class="w-full h-11 px-4 py-2 bg-base border myBorder rounded-lg outline-none min-w-0">
+                    <option value="ALL">Tous les statuts</option>
+                    <option value="ACTIVE">Actif</option>
+                    <option value="INACTIVE">Inactif</option>
                 </select>
-            </div>
 
-            <div class="flex items-end h-11">
-                <button (click)="resetFilters()" class="w-full btn-primary py-2 rounded-lg transition">
-                    Reset
+                <!-- Réinitialiser -->
+                <button (click)="resetFilters()" class="w-full h-11 btn-primary px-6 rounded-lg transition">
+                    Réinitialiser
                 </button>
             </div>
         </div>
@@ -82,14 +83,14 @@
     <app-my-table-layout ListName="Users" Name="User" [Total]="filteredUsers().length.toString()">
 
         @if (filteredUsers().length === 0) {
-        <div class="p-12 text-center text-sec">No users found</div>
+        <div class="p-12 text-center text-sec">Aucun utilisateur trouvé</div>
         } @else {
         <table class="min-w-full divide-y myBorder">
             <thead class="bg-base myBorder">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-sec">Username</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-sec">Role</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-sec">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-sec">Nom d'utilisateur</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-sec">Rôle</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-sec">Statut</th>
                     <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-sec max-w-[10%]">Actions</th>
                 </tr>
             </thead>
@@ -123,14 +124,14 @@
                     </td>
                     <td class="px-1 py-4">
                         <div class="flex gap-2 justify-end">
-                            <button (click)="editUser(user)" class="btn shadow-sm rounded-sm" title="Edit">
+                            <button (click)="editUser(user)" class="btn shadow-sm rounded-sm" title="Modifier">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                 </svg>
                             </button>
-                            <button (click)="deleteUser(user)" class="btn shadow-sm rounded-sm" title="Delete">
+                            <button (click)="deleteUser(user)" class="btn shadow-sm rounded-sm" title="Supprimer">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
@@ -18,15 +18,23 @@ export class ReferenceDataService {
 
   private domainesSubject = new BehaviorSubject<DomaineDTO[]>([]);
   public domaines$ = this.domainesSubject.asObservable();
+  private _domaines = signal<DomaineDTO[]>([]);
+  readonly domaines = this._domaines.asReadonly();
 
   private structuresSubject = new BehaviorSubject<StructureDTO[]>([]);
   public structures$ = this.structuresSubject.asObservable();
+  private _structures = signal<StructureDTO[]>([]);
+  readonly structures = this._structures.asReadonly();
 
   private profilsSubject = new BehaviorSubject<ProfilDTO[]>([]);
   public profils$ = this.profilsSubject.asObservable();
+  private _profils = signal<ProfilDTO[]>([]);
+  readonly profils = this._profils.asReadonly();
 
   private employeursSubject = new BehaviorSubject<EmployeurDTO[]>([]);
   public employeurs$ = this.employeursSubject.asObservable();
+  private _employeurs = signal<EmployeurDTO[]>([]);
+  readonly employeurs = this._employeurs.asReadonly();
 
   constructor(private http: HttpClient) { }
 
@@ -35,7 +43,10 @@ export class ReferenceDataService {
   /** GET /api/reference/domaines */
   getDomaines(): Observable<DomaineDTO[]> {
     return this.http.get<DomaineDTO[]>(`${this.apiUrl}/domaines`).pipe(
-      tap(data => this.domainesSubject.next(data)),
+      tap(data => {
+        this.domainesSubject.next(data);
+        this._domaines.set(data);
+      }),
       catchError(error => {
         console.error('Error loading domaines:', error);
         return of([]);
@@ -56,7 +67,9 @@ export class ReferenceDataService {
   createDomaine(domaine: DomaineDTO): Observable<DomaineDTO> {
     return this.http.post<DomaineDTO>(`${this.apiUrl}/domaines`, domaine).pipe(
       tap(created => {
-        this.domainesSubject.next([...this.domainesSubject.value, created]);
+        const next = [...this.domainesSubject.value, created];
+        this.domainesSubject.next(next);
+        this._domaines.set(next);
       })
     );
   }
@@ -71,6 +84,7 @@ export class ReferenceDataService {
           const next = [...current];
           next[idx] = updated;
           this.domainesSubject.next(next);
+          this._domaines.set(next);
         }
       })
     );
@@ -80,9 +94,9 @@ export class ReferenceDataService {
   deleteDomaine(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/domaines/${id}`).pipe(
       tap(() => {
-        this.domainesSubject.next(
-          this.domainesSubject.value.filter(d => d.id !== id)
-        );
+        const next = this.domainesSubject.value.filter(d => d.id !== id);
+        this.domainesSubject.next(next);
+        this._domaines.set(next);
       })
     );
   }
@@ -96,7 +110,10 @@ export class ReferenceDataService {
   /** GET /api/reference/structures */
   getStructures(): Observable<StructureDTO[]> {
     return this.http.get<StructureDTO[]>(`${this.apiUrl}/structures`).pipe(
-      tap(data => this.structuresSubject.next(data)),
+      tap(data => {
+        this.structuresSubject.next(data);
+        this._structures.set(data);
+      }),
       catchError(error => {
         console.error('Error loading structures:', error);
         return of([]);
@@ -117,7 +134,9 @@ export class ReferenceDataService {
   createStructure(structure: StructureDTO): Observable<StructureDTO> {
     return this.http.post<StructureDTO>(`${this.apiUrl}/structures`, structure).pipe(
       tap(created => {
-        this.structuresSubject.next([...this.structuresSubject.value, created]);
+        const next = [...this.structuresSubject.value, created];
+        this.structuresSubject.next(next);
+        this._structures.set(next);
       })
     );
   }
@@ -132,6 +151,7 @@ export class ReferenceDataService {
           const next = [...current];
           next[idx] = updated;
           this.structuresSubject.next(next);
+          this._structures.set(next);
         }
       })
     );
@@ -141,9 +161,9 @@ export class ReferenceDataService {
   deleteStructure(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/structures/${id}`).pipe(
       tap(() => {
-        this.structuresSubject.next(
-          this.structuresSubject.value.filter(s => s.id !== id)
-        );
+        const next = this.structuresSubject.value.filter(s => s.id !== id);
+        this.structuresSubject.next(next);
+        this._structures.set(next);
       })
     );
   }
@@ -157,7 +177,10 @@ export class ReferenceDataService {
   /** GET /api/reference/profils */
   getProfils(): Observable<ProfilDTO[]> {
     return this.http.get<ProfilDTO[]>(`${this.apiUrl}/profils`).pipe(
-      tap(data => this.profilsSubject.next(data)),
+      tap(data => {
+        this.profilsSubject.next(data);
+        this._profils.set(data);
+      }),
       catchError(error => {
         console.error('Error loading profils:', error);
         return of([]);
@@ -178,7 +201,9 @@ export class ReferenceDataService {
   createProfil(profil: ProfilDTO): Observable<ProfilDTO> {
     return this.http.post<ProfilDTO>(`${this.apiUrl}/profils`, profil).pipe(
       tap(created => {
-        this.profilsSubject.next([...this.profilsSubject.value, created]);
+        const next = [...this.profilsSubject.value, created];
+        this.profilsSubject.next(next);
+        this._profils.set(next);
       })
     );
   }
@@ -193,6 +218,7 @@ export class ReferenceDataService {
           const next = [...current];
           next[idx] = updated;
           this.profilsSubject.next(next);
+          this._profils.set(next);
         }
       })
     );
@@ -202,9 +228,9 @@ export class ReferenceDataService {
   deleteProfil(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/profils/${id}`).pipe(
       tap(() => {
-        this.profilsSubject.next(
-          this.profilsSubject.value.filter(p => p.id !== id)
-        );
+        const next = this.profilsSubject.value.filter(p => p.id !== id);
+        this.profilsSubject.next(next);
+        this._profils.set(next);
       })
     );
   }
@@ -218,7 +244,10 @@ export class ReferenceDataService {
   /** GET /api/reference/employeurs */
   getEmployeurs(): Observable<EmployeurDTO[]> {
     return this.http.get<EmployeurDTO[]>(`${this.apiUrl}/employeurs`).pipe(
-      tap(data => this.employeursSubject.next(data)),
+      tap(data => {
+        this.employeursSubject.next(data);
+        this._employeurs.set(data);
+      }),
       catchError(error => {
         console.error('Error loading employeurs:', error);
         return of([]);
@@ -239,7 +268,9 @@ export class ReferenceDataService {
   createEmployeur(employeur: EmployeurDTO): Observable<EmployeurDTO> {
     return this.http.post<EmployeurDTO>(`${this.apiUrl}/employeurs`, employeur).pipe(
       tap(created => {
-        this.employeursSubject.next([...this.employeursSubject.value, created]);
+        const next = [...this.employeursSubject.value, created];
+        this.employeursSubject.next(next);
+        this._employeurs.set(next);
       })
     );
   }
@@ -254,6 +285,7 @@ export class ReferenceDataService {
           const next = [...current];
           next[idx] = updated;
           this.employeursSubject.next(next);
+          this._employeurs.set(next);
         }
       })
     );
@@ -263,9 +295,9 @@ export class ReferenceDataService {
   deleteEmployeur(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/employeurs/${id}`).pipe(
       tap(() => {
-        this.employeursSubject.next(
-          this.employeursSubject.value.filter(e => e.id !== id)
-        );
+        const next = this.employeursSubject.value.filter(e => e.id !== id);
+        this.employeursSubject.next(next);
+        this._employeurs.set(next);
       })
     );
   }

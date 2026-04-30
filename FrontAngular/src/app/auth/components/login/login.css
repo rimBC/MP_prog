@@ -1,9 +1,9 @@
 .shimer {
     background: linear-gradient(to right,
-            var(--color-primary-500) 20%,
-            var(--color-primary-600) 30%,
-            var(--color-primary-600) 70%,
-            var(--color-primary-500) 80%);
+            var(--color-primary-600) 20%,
+            var(--color-primary-500) 30%,
+            var(--color-primary-500) 70%,
+            var(--color-primary-600) 80%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

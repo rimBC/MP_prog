@@ -61,7 +61,6 @@ export class Login implements OnInit{
  
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        alert("response received")
         // Redirect to appropriate dashboard based on role
         this.redirectByRole(response.role);
       },
@@ -78,13 +77,12 @@ export class Login implements OnInit{
   private redirectByRole(role: string): void {
 
     const dashboardMap: { [key: string]: string } = {
-      'SIMPLE_UTILISATEUR': '/user/trainers',
-      'RESPONSABLE': '/user/trainers',
-      'ADMINISTRATEUR': '/user/trainers'
+      'SIMPLE_UTILISATEUR': '/user/home',
+      'RESPONSABLE': '/user/home',
+      'ADMINISTRATEUR': '/user/home'
     };
  
-    const dashboardUrl = dashboardMap[role] || '/dashboard';
-    alert(dashboardUrl)
+    const dashboardUrl = dashboardMap[role] || '/user/home';
 
     this.router.navigate([dashboardUrl]);
   }

@@ -43,7 +43,9 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     
     children: [
-      
+        // Default redirect
+      { path: '', redirectTo: 'user/home', pathMatch: 'full' },
+
       
       { path: 'contact', component: Contact } ,
       
@@ -51,7 +53,7 @@ export const routes: Routes = [
       {
         path: 'user',
         children: [
-          { path: 'Home', component: Home },
+          { path: 'home', component: Home },
           { path: 'trainers', component: ManageFormateur }, 
           { path: 'trainings', component: ManageFormation },
           { path: 'trainings/:id', component: FormationDetails },
@@ -66,8 +68,6 @@ export const routes: Routes = [
       {
         path: 'manager',
         children: [
-          
-          { path: 'Home', component: Home },
           { path: 'statistics', component: Dashboard },
           { path: 'reports', component: Testing }, 
         ],
@@ -79,7 +79,6 @@ export const routes: Routes = [
       {
         path: 'admin',
         children: [
-          { path: 'Home', component: Home },
           { path: 'users', component: ManageUsers },
           { path: 'domains', component: Testing }, 
           { path: 'structures', component: Testing }, 
@@ -105,9 +104,6 @@ export const routes: Routes = [
     path: 'unauthorized',
     component: Unauthorized 
   },
-
-  // Default redirect
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
 
   // Wildcard route
   { path: '**', redirectTo: '/auth/login' }

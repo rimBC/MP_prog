@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReferenceDataService } from '../../../core/services/refrence-dat.service';
 import { Domaine } from '../../../models/domaine.interface';
@@ -21,13 +21,14 @@ type ConfigItem = Domaine | Structure | Profil | Employeur;
 })
 export class Configurations implements OnInit {
 
-  activeTab: SettingsTab = 'domains';
+  private referenceDataService = inject(ReferenceDataService);
 
-  // Data
-  domaines: Domaine[] = [];
-  structures: Structure[] = [];
-  profils: Profil[] = [];
-  employeurs: Employeur[] = [];
+  readonly activeTab = signal<SettingsTab>('domains');
+
+  readonly domaines = this.referenceDataService.domaines;
+  readonly structures = this.referenceDataService.structures;
+  readonly profils = this.referenceDataService.profils;
+  readonly employeurs = this.referenceDataService.employeurs;
 
   // State
   loading = false;
@@ -38,18 +39,41 @@ export class Configurations implements OnInit {
   modalOpen = false;
   editingEntity: ConfigEntity | null = null;
 
-  constructor(private referenceDataService: ReferenceDataService) {}
+  // Pagination
+  readonly pageSize = signal(10);
+  readonly pageIndex = signal(0);
 
-  ngOnInit(): void {
-    this.loadAllData();
+  readonly currentList = computed<ConfigItem[]>(() => {
+    switch (this.activeTab()) {
+      case 'domains': return this.domaines();
+      case 'structures': return this.structures();
+      case 'profiles': return this.profils();
+      case 'employeurs': return this.employeurs();
+    }
+  });
+
+  readonly pagedList = computed<ConfigItem[]>(() => {
+    const list = this.currentList();
+    const size = this.pageSize();
+    const start = this.pageIndex() * size;
+    return list.slice(start, start + size);
+  });
+
+  constructor() {
+    // Reset to first page when switching tab or when the list shrinks past the current page.
+    effect(() => {
+      this.activeTab();
+      this.pageIndex.set(0);
+    });
+    effect(() => {
+      const total = this.currentList().length;
+      const size = this.pageSize();
+      const lastPage = Math.max(0, Math.ceil(total / size) - 1);
+      if (this.pageIndex() > lastPage) this.pageIndex.set(lastPage);
+    });
   }
 
-  private loadAllData(): void {
-    this.referenceDataService.domaines$.subscribe(data => this.domaines = data);
-    this.referenceDataService.structures$.subscribe(data => this.structures = data);
-    this.referenceDataService.profils$.subscribe(data => this.profils = data);
-    this.referenceDataService.employeurs$.subscribe(data => this.employeurs = data);
-
+  ngOnInit(): void {
     this.referenceDataService.loadDomaines();
     this.referenceDataService.loadStructures();
     this.referenceDataService.loadProfils();
@@ -57,14 +81,14 @@ export class Configurations implements OnInit {
   }
 
   switchTab(tab: SettingsTab): void {
-    this.activeTab = tab;
+    this.activeTab.set(tab);
     this.closeModal();
   }
 
   // ==================== TAB METADATA ====================
 
   get tabName(): string {
-    switch (this.activeTab) {
+    switch (this.activeTab()) {
       case 'domains': return 'Domain';
       case 'structures': return 'Structure';
       case 'profiles': return 'Profile';
@@ -73,7 +97,7 @@ export class Configurations implements OnInit {
   }
 
   get tabPlural(): string {
-    switch (this.activeTab) {
+    switch (this.activeTab()) {
       case 'domains': return 'Domains';
       case 'structures': return 'Structures';
       case 'profiles': return 'Profiles';
@@ -81,25 +105,16 @@ export class Configurations implements OnInit {
     }
   }
 
-  get currentList(): ConfigItem[] {
-    switch (this.activeTab) {
-      case 'domains': return this.domaines;
-      case 'structures': return this.structures;
-      case 'profiles': return this.profils;
-      case 'employeurs': return this.employeurs;
-    }
-  }
-
   get showLieu(): boolean {
-    return this.activeTab === 'structures';
+    return this.activeTab() === 'structures';
   }
 
   get showDescription(): boolean {
-    return this.activeTab !== 'employeurs';
+    return this.activeTab() !== 'employeurs';
   }
 
   get isEmployeurTab(): boolean {
-    return this.activeTab === 'employeurs';
+    return this.activeTab() === 'employeurs';
   }
 
   displayName(item: ConfigItem): string {
@@ -152,7 +167,7 @@ export class Configurations implements OnInit {
   }
 
   private buildOperation(data: ConfigEntity, editingId: number | null): Observable<any> {
-    switch (this.activeTab) {
+    switch (this.activeTab()) {
       case 'domains':
         return editingId
           ? this.referenceDataService.updateDomaine(editingId, data as Domaine)
@@ -181,7 +196,7 @@ export class Configurations implements OnInit {
     }
 
     const op$: Observable<any> = (() => {
-      switch (this.activeTab) {
+      switch (this.activeTab()) {
         case 'domains': return this.referenceDataService.deleteDomaine(id);
         case 'structures': return this.referenceDataService.deleteStructure(id);
         case 'profiles': return this.referenceDataService.deleteProfil(id);

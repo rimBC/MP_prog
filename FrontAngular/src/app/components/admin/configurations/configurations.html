@@ -27,8 +27,8 @@
 
     <!-- Tabs -->
     <div class="flex gap-4 mb-6 border-b border-gray-500/20 text-sec">
-        <button (click)="switchTab('domains')" [class.text-primary]="activeTab === 'domains'"
-            [class.border-b-2]="activeTab === 'domains'" [class.border-sec]="activeTab === 'domains'"
+        <button (click)="switchTab('domains')" [class.text-primary]="activeTab() === 'domains'"
+            [class.border-b-2]="activeTab() === 'domains'" [class.border-sec]="activeTab() === 'domains'"
             class="pb-3 px-4 font-medium transition-colors hover:border-b-2 flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="size-6">
@@ -38,8 +38,8 @@
             Domains
         </button>
 
-        <button (click)="switchTab('structures')" [class.text-primary]="activeTab === 'structures'"
-            [class.border-b-2]="activeTab === 'structures'" [class.border-sec]="activeTab === 'structures'"
+        <button (click)="switchTab('structures')" [class.text-primary]="activeTab() === 'structures'"
+            [class.border-b-2]="activeTab() === 'structures'" [class.border-sec]="activeTab() === 'structures'"
             class="pb-3 px-4 font-medium transition-colors hover:border-b-2 flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="size-6">
@@ -50,8 +50,8 @@
             Structures
         </button>
 
-        <button (click)="switchTab('profiles')" [class.text-primary]="activeTab === 'profiles'"
-            [class.border-b-2]="activeTab === 'profiles'" [class.border-sec]="activeTab === 'profiles'"
+        <button (click)="switchTab('profiles')" [class.text-primary]="activeTab() === 'profiles'"
+            [class.border-b-2]="activeTab() === 'profiles'" [class.border-sec]="activeTab() === 'profiles'"
             class="pb-3 px-4 font-medium transition-colors hover:border-b-2 flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="size-6">
@@ -61,8 +61,8 @@
             Profiles
         </button>
 
-        <button (click)="switchTab('employeurs')" [class.text-primary]="activeTab === 'employeurs'"
-            [class.border-b-2]="activeTab === 'employeurs'" [class.border-sec]="activeTab === 'employeurs'"
+        <button (click)="switchTab('employeurs')" [class.text-primary]="activeTab() === 'employeurs'"
+            [class.border-b-2]="activeTab() === 'employeurs'" [class.border-sec]="activeTab() === 'employeurs'"
             class="pb-3 px-4 font-medium transition-colors hover:border-b-2 flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="size-6">
@@ -75,9 +75,14 @@
     </div>
 
     <!-- Table Layout -->
-    <app-my-table-layout [ListName]="tabPlural" [Name]="tabName" [Total]="currentList.length.toString()">
+    <app-my-table-layout [ListName]="tabPlural" [Name]="tabName"
+        [Total]="currentList().length.toString()"
+        [totalItems]="currentList().length"
+        [pageSize]="pageSize()"
+        [pageIndex]="pageIndex()"
+        (pageIndexChange)="pageIndex.set($event)">
 
-        @if (currentList.length === 0) {
+        @if (currentList().length === 0) {
         <div class="p-12 text-center text-sec">No {{ tabPlural.toLowerCase() }} created yet</div>
         } @else {
         <table class="min-w-full divide-y myBorder">
@@ -97,7 +102,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y myBorder bg-sec">
-                @for (item of currentList; track item.id) {
+                @for (item of pagedList(); track item.id) {
                 <tr class="hover:bg-sec transition myBorder">
                     <td class="px-6 py-4 text-primary font-medium">{{ displayName(item) }}</td>
                     @if (showLieu) {

@@ -2,13 +2,13 @@
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold text-primary mb-2">Formation Management</h1>
-            <p class="text-sec">Create, manage, and organize training sessions</p>
+            <h1 class="text-4xl font-bold text-primary mb-2">Gestion des Formations</h1>
+            <p class="text-sec">Créer, gérer et organiser les sessions de formation</p>
         </div>
-        
+
         <div class="flex gap-4 items-center">
             <button (click)="openCreateModal()" class="btn btn-primary font-medium rounded-lg transition text-sm">
-                ✚ Add Formation
+                ✚ Ajouter une Formation
             </button>
         </div>
     </div>
@@ -27,58 +27,62 @@
 
     <!-- Filters Section -->
     <div class="bg-sec rounded-lg shadow-lg p-4 mb-8">
-        <div class="grid grid-cols-1 lg:grid-cols-6 gap-4 items-center">
+        <div class="flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-end lg:justify-between">
 
-            <div class="flex flex-col lg:flex-row lg:justify-left lg:gap-4 items-center text-sec md:col-span-2">
-                <div class="flex text-sec h-11">
-                    <div
-                        class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12">
+            <!-- Header: title + count (hidden below lg) -->
+            <div class="hidden lg:flex flex-col shrink-0">
+                <h2 class="text-xl font-bold text-primary">Filtres</h2>
+                <p class="text-sec text-sm whitespace-nowrap">
+                    Affiche {{ filteredFormations().length }} de {{ formations().length }} formations
+                </p>
+            </div>
+
+            <!-- Filter controls grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3 flex-1 min-w-0 ">
+
+                <!-- Search -->
+                <div class="flex h-11 w-full min-w-0 sm:col-span-2">
+                    <div class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12 shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                             class="size-3.5">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
                     </div>
-                    <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)" placeholder="Search"
-                        class="px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
+                    <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)" placeholder="Rechercher"
+                        class="flex-1 min-w-0 px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
                 </div>
-              
-              
-            </div>
 
-            <div>
+                <!-- Statut -->
                 <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)"
-                    class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
-                    <option value="ALL">All Status</option>
+                    class="w-full h-11 px-4 py-2 bg-base border myBorder rounded-lg outline-none min-w-0">
+                    <option value="ALL">Tous statuts</option>
                     @for (status of statuses; track status.value) {
                     <option [value]="status.value">{{ status.label }}</option>
                     }
                 </select>
-            </div>
 
-            <div>
+                <!-- Domaine -->
                 <select [ngModel]="filterDomain()" (ngModelChange)="filterDomain.set($event)"
-                    class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
-                    <option value="ALL">All Domains</option>
+                    class="w-full h-11 px-4 py-2 bg-base border myBorder rounded-lg outline-none min-w-0">
+                    <option value="ALL">Tous domaines</option>
                     @for (domain of domaines(); track domain.id) {
                     <option [value]="domain.id">{{ domain.libelle }}</option>
                     }
                 </select>
-            </div>
 
-            <div>
+                <!-- Année -->
                 <select [ngModel]="filterYear()" (ngModelChange)="filterYear.set($event)"
-                    class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
-                    <option value="ALL">All Years</option>
+                    class="w-full h-11 px-4 py-2 bg-base border myBorder rounded-lg outline-none min-w-0">
+                    <option value="ALL">Toutes années</option>
                     @for (year of getAvailableYears(); track year) {
                     <option [value]="year.toString()">{{ year }}</option>
                     }
                 </select>
-            </div>
 
-            <div class="flex items-end h-11">
-                <button (click)="resetFilters()" class="w-full btn-primary py-2 rounded-lg transition">
-                    Reset
+                <!-- Réinitialiser -->
+                <button (click)="resetFilters()" class="w-full h-11 btn-primary px-6 rounded-lg transition">
+                    Réinitialiser
                 </button>
             </div>
         </div>
@@ -87,8 +91,8 @@
     <!-- Formations Grid (mobile / tablet) -->
     @if (filteredFormations().length === 0) {
     <div class="bg-sec rounded-2xl shadow-lg p-12 text-center border myBorder">
-        <p class="text-2xl text-primary mb-2">No formations found</p>
-        <p class="text-sec">Try adjusting your filters or create a new formation</p>
+        <p class="text-2xl text-primary mb-2">Aucune formation trouvée</p>
+        <p class="text-sec">Essayez d'ajuster vos filtres ou de créer une nouvelle formation</p>
     </div>
     } @else {
     <div class="lg:hidden">
@@ -109,7 +113,7 @@
             <p class="text-xs sm:text-sm text-sec text-center sm:text-left">
                 Page <span class="font-medium text-primary">{{ pageIndex() + 1 }}</span>
                 / <span class="font-medium text-primary">{{ totalPages() }}</span>
-                — <span class="font-medium text-primary">{{ sortedFormations().length }}</span> results
+                — <span class="font-medium text-primary">{{ sortedFormations().length }}</span> résultats
             </p>
             <nav class="inline-flex -space-x-px self-center sm:self-auto">
                 <button class="px-3 py-1.5 text-sec border myBorder rounded-l-md hover:bg-primary/10 disabled:opacity-50"
@@ -145,19 +149,19 @@
                 <tr>
                     <th class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
                         (click)="setSort('titre')">
-                        Title
+                        Titre
                         <i class="bi" [class.bi-caret-up-fill]="sortKey()==='titre' && sortDir()==='asc'"
                                       [class.bi-caret-down-fill]="sortKey()==='titre' && sortDir()==='desc'"></i>
                     </th>
                     <th class="hidden md:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
                         (click)="setSort('domaineLibelle')">
-                        Domain
+                        Domaine
                         <i class="bi" [class.bi-caret-up-fill]="sortKey()==='domaineLibelle' && sortDir()==='asc'"
                                       [class.bi-caret-down-fill]="sortKey()==='domaineLibelle' && sortDir()==='desc'"></i>
                     </th>
                     <th class="hidden sm:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
                         (click)="setSort('duree')">
-                        Duration
+                        Durée
                         <i class="bi" [class.bi-caret-up-fill]="sortKey()==='duree' && sortDir()==='asc'"
                                       [class.bi-caret-down-fill]="sortKey()==='duree' && sortDir()==='desc'"></i>
                     </th>
@@ -169,7 +173,7 @@
                     </th>
                     <th class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-sec uppercase cursor-pointer select-none"
                         (click)="setSort('statut')">
-                        Status
+                        Statut
                         <i class="bi" [class.bi-caret-up-fill]="sortKey()==='statut' && sortDir()==='asc'"
                                       [class.bi-caret-down-fill]="sortKey()==='statut' && sortDir()==='desc'"></i>
                     </th>
@@ -203,7 +207,7 @@
                     <td class="px-3 sm:px-4 py-3 text-sm">
                         <div class="flex gap-2 justify-center">
                             <button (click)="editFormation(f); $event.stopPropagation()"
-                                class="btn shadow-sm rounded-sm p-1.5" title="Edit">
+                                class="btn shadow-sm rounded-sm p-1.5" title="Modifier">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -211,7 +215,7 @@
                                 </svg>
                             </button>
                             <button (click)="deleteFormation(f); $event.stopPropagation()"
-                                class="btn shadow-sm rounded-sm p-1.5" title="Delete">
+                                class="btn shadow-sm rounded-sm p-1.5" title="Supprimer">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -224,7 +228,7 @@
                 } @empty {
                 <tr>
                     <td colspan="7" class="px-4 py-8 text-center text-sec text-sm">
-                        No formations match the current filters.
+                        Aucune formation ne correspond aux filtres actuels.
                     </td>
                 </tr>
                 }
@@ -236,7 +240,7 @@
             <p class="text-xs sm:text-sm text-sec text-center sm:text-left">
                 Page <span class="font-medium text-primary">{{ pageIndex() + 1 }}</span>
                 / <span class="font-medium text-primary">{{ totalPages() }}</span>
-                — <span class="font-medium text-primary">{{ sortedFormations().length }}</span> results
+                — <span class="font-medium text-primary">{{ sortedFormations().length }}</span> résultats
             </p>
             <nav class="inline-flex -space-x-px self-center sm:self-auto">
                 <button class="px-3 py-1.5 text-sec border myBorder rounded-l-md hover:bg-primary/10 disabled:opacity-50"

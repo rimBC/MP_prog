@@ -5,7 +5,7 @@ export const MENU_ITEMS: MenuItem[] = [
       {
         label: 'Home',
         icon: 'icons/home.svg',
-        route: '/user/Home',
+        route: '/user/home',
         roles: ['SIMPLE_UTILISATEUR', 'RESPONSABLE', 'ADMINISTRATEUR']
       },
       {

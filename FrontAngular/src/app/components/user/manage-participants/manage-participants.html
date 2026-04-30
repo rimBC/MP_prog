@@ -1,13 +1,13 @@
-<div class="max-w-7xl mx-auto p-6 bg-base text-primary">
+<div class="xl:mx-10 xl:mt-6 mx-auto p-6 bg-base text-primary">
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold text-primary mb-2">Participant Management</h1>
-            <p class="text-sec">Manage training participants/trainees</p>
+            <h1 class="text-4xl font-bold text-primary mb-2">Gestion des Participants</h1>
+            <p class="text-sec">Gérer les participants/stagiaires des formations</p>
         </div>
         <div class="flex gap-4 items-center">
             <button (click)="openCreateModal()" class="px-6 py-2 btn-primary font-medium rounded-lg transition">
-                ✚ Add Participant
+                ✚ Ajouter un Participant
             </button>
         </div>
     </div>
@@ -27,52 +27,64 @@
 <!-- Filters Section -->
 <div class="bg-sec rounded-lg shadow-lg p-4 mb-8">
 
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-end lg:justify-between">
 
-        <!-- Left: title + count -->
-        <div class="flex flex-col min-w-40">
-            <h2 class="text-xl font-bold text-primary">Filters</h2>
-            <p class="text-sec text-sm">
-                Showing {{ filteredParticipants().length }} of {{ participants().length }} participants
+        <!-- Header: title + count (hidden below lg) -->
+        <div class="hidden lg:flex flex-col shrink-0">
+            <h2 class="text-xl font-bold text-primary">Filtres</h2>
+            <p class="text-sec text-sm whitespace-nowrap">
+                Affiche {{ filteredParticipants().length }} de {{ participants().length }} participants
             </p>
         </div>
 
-        <!-- Middle: filters inline -->
-        <div class="flex flex-wrap items-center gap-3">
-        
-            <!-- Department -->
+        <!-- Filter controls grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3 flex-1 min-w-0">
+
+            <!-- Search -->
+            <div class="flex h-11 w-full min-w-0 sm:col-span-2">
+                <div class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                        class="size-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                </div>
+                <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
+                    placeholder="Rechercher"
+                    class="flex-1 min-w-0 px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
+            </div>
+
+            <!-- Département -->
             <select [ngModel]="filterStructure()" (ngModelChange)="filterStructure.set($event)"
-                class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
-                <option value="ALL">All Departments</option>
+                class="w-full h-11 px-4 bg-base border myBorder rounded-lg outline-none min-w-0">
+                <option value="ALL">Tous départements</option>
                 @for (structure of structures(); track structure.id) {
                 <option [value]="structure.id">{{ structure.libelle }}</option>
                 }
             </select>
 
-            <!-- Job Profile -->
+            <!-- Profil -->
             <select [ngModel]="filterProfil()" (ngModelChange)="filterProfil.set($event)"
-                class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
-                <option value="ALL">All Profiles</option>
+                class="w-full h-11 px-4 bg-base border myBorder rounded-lg outline-none min-w-0">
+                <option value="ALL">Tous profils</option>
                 @for (profil of profils(); track profil.id) {
                 <option [value]="profil.id">{{ profil.libelle }}</option>
                 }
             </select>
 
-            <!-- Status -->
+            <!-- Statut -->
             <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)"
-                class="h-11 px-4 bg-base border myBorder rounded-lg outline-none w-52">
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
+                class="w-full h-11 px-4 bg-base border myBorder rounded-lg outline-none min-w-0">
+                <option value="ALL">Tous statuts</option>
+                <option value="ACTIVE">Actif</option>
+                <option value="INACTIVE">Inactif</option>
             </select>
 
-            <!-- Right: reset -->
-                <button (click)="resetFilters()" class="btn-primary px-6 py-2 rounded-lg transition  w-52">
-                    Reset
-                </button>
+            <!-- Réinitialiser -->
+            <button (click)="resetFilters()" class="btn-primary w-full h-11 px-6 rounded-lg transition">
+                Réinitialiser
+            </button>
         </div>
-
-        
 
     </div>
 </div>
@@ -81,7 +93,7 @@
             ========================== -->
 <div class="block lg:hidden space-y-4">
 
-    @for (participant of filteredParticipants(); track participant) {
+    @for (participant of pagedParticipants(); track participant) {
 
     <div (click)="viewParticipant(participant)"
         class="bg-sec rounded-lg shadow p-4 border myBorder cursor-pointer hover:border-base-contrast transition">
@@ -98,12 +110,12 @@
 
             @if (participant.actif) {
             <span class="px-2 py-1 bg-base-contrast text-white rounded-full text-xs">
-                Active
+                Actif
             </span>
             }
             @else {
             <span class="px-2 py-1 bg-base text-sec rounded-full text-xs">
-                Inactive
+                Inactif
             </span>
             }
 
@@ -111,11 +123,11 @@
 
         <!-- Info -->
         <div class="text-sm text-sec space-y-1">
-            <p><span class="text-primary">Phone:</span> {{ participant.tel }}</p>
-            <p><span class="text-primary">Department:</span> {{ participant.structureLibelle }}</p>
-            <p><span class="text-primary">Profile:</span> {{ participant.profilLibelle }}</p>
-            <p><span class="text-primary">Date:</span> {{ formatDate(participant.dateEmbauche || '') }}</p>
-            <p><span class="text-primary">Formations:</span> {{ formationCount(participant) }}</p>
+            <p><span class="text-primary">Téléphone :</span> {{ participant.tel }}</p>
+            <p><span class="text-primary">Département :</span> {{ participant.structureLibelle }}</p>
+            <p><span class="text-primary">Profil :</span> {{ participant.profilLibelle }}</p>
+            <p><span class="text-primary">Date :</span> {{ formatDate(participant.dateEmbauche || '') }}</p>
+            <p><span class="text-primary">Formations :</span> {{ formationCount(participant) }}</p>
         </div>
 
         <!-- Actions -->
@@ -141,10 +153,34 @@
 
     }
 
+    <!-- Mobile pagination footer -->
+    @if (filteredParticipants().length > pageSize()) {
+    <div class="mt-4 flex items-center justify-between gap-3 px-3 py-2 bg-sec border myBorder rounded-lg">
+        <button class="px-3 py-1.5 text-sec border myBorder rounded-md hover:bg-primary/10 disabled:opacity-50"
+                [disabled]="pageIndex() === 0"
+                (click)="pageIndex.set(pageIndex() - 1)">
+            ‹ Précédent
+        </button>
+        <p class="text-xs text-sec">
+            Page <span class="font-medium text-primary">{{ pageIndex() + 1 }}</span>
+            sur <span class="font-medium text-primary">{{ totalPages() }}</span>
+        </p>
+        <button class="px-3 py-1.5 text-sec border myBorder rounded-md hover:bg-primary/10 disabled:opacity-50"
+                [disabled]="pageIndex() >= totalPages() - 1"
+                (click)="pageIndex.set(pageIndex() + 1)">
+            Suivant ›
+        </button>
+    </div>
+    }
+
 </div>
     <!-- Participants Table -->
-    <app-my-table-layout class="hidden lg:block" ListName="Participants" Name="Participant" 
+    <app-my-table-layout class="hidden lg:block" ListName="Participants" Name="Participant"
     [Total]="filteredParticipants().length.toString()"
+    [totalItems]="filteredParticipants().length"
+    [pageSize]="pageSize()"
+    [pageIndex]="pageIndex()"
+    (pageIndexChange)="pageIndex.set($event)"
     (searchClicked)="($event)"
     (addClicked)="openCreateModal()"
     (exportClicked)="openCreateModal()">
@@ -155,8 +191,8 @@
             ========================== -->
             @if (filteredParticipants().length === 0) {
             <div class="bg-sec shadow-lg p-8 text-center text-sec">
-                <p class="text-lg mb-2">No participants found</p>
-                <p class="text-sm">Try adjusting your filters or add a new participant</p>
+                <p class="text-lg mb-2">Aucun participant trouvé</p>
+                <p class="text-sm">Essayez d'ajuster vos filtres ou d'ajouter un nouveau participant</p>
             </div>
             }
         
@@ -171,11 +207,11 @@
         
                     <thead class="bg-sec border-b myBorder">
                         <tr>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[15%]">Name</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[20%] text-nowrap">Email</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[15%]">Department</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[15%]">Profile</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[8%]">Status</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[15%]">Nom</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[20%] text-nowrap">E-mail</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[15%]">Département</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[15%]">Profil</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-sec w-[8%]">Statut</th>
                             <th class="text-center text-sm font-semibold text-sec w-[7%] ">Formations</th>
                             <th class="px-1 py-3 text-center text-sm font-semibold text-sec w-[10%]">Actions</th>
                         </tr>
@@ -183,7 +219,7 @@
         
                     <tbody>
         
-                        @for (participant of filteredParticipants(); track participant) {
+                        @for (participant of pagedParticipants(); track participant) {
 
                         <tr (click)="viewParticipant(participant)"
                             class="border-b myBorder hover:bg-base transition cursor-pointer">
@@ -216,16 +252,16 @@
                                 </span>
                             </td>
         
-                            <!-- Status -->
+                            <!-- Statut -->
                             <td class="px-4 py-4">
                                 @if (participant.actif) {
                                 <span class="px-2 py-1 bg-base-contrast text-white rounded-full text-sm">
-                                    Active
+                                    Actif
                                 </span>
                                 }
                                 @else {
                                 <span class="px-2 py-1 bg-base text-sec rounded-full text-sm">
-                                    Inactive
+                                    Inactif
                                 </span>
                                 }
                             </td>
@@ -273,27 +309,40 @@
         
         
     </app-my-table-layout>
-<!-- Department Information Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
-    <div class="bg-sec p-4 rounded-lg border myBorder">
-        <h3 class="font-bold text-primary mb-1 text-sm">IT Department</h3>
-        <p class="text-xs text-sec">Location: Tunis</p>
+<!-- Cartes d'information sur les départements -->
+<div class="mt-8">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-bold text-primary">Départements</h3>
+        <div class="flex gap-2">
+            <button (click)="deptScroller.scrollBy({ left: -320, behavior: 'smooth' })"
+                class="btn shadow-sm rounded-full p-2" title="Précédent" aria-label="Défiler vers la gauche">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+            </button>
+            <button (click)="deptScroller.scrollBy({ left: 320, behavior: 'smooth' })"
+                class="btn shadow-sm rounded-full p-2" title="Suivant" aria-label="Défiler vers la droite">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+            </button>
+        </div>
     </div>
-    <div class="bg-sec p-4 rounded-lg border myBorder">
-        <h3 class="font-bold text-primary mb-1 text-sm">HR Department</h3>
-        <p class="text-xs text-sec">Location: Sousse</p>
-    </div>
-    <div class="bg-sec p-4 rounded-lg border myBorder">
-        <h3 class="font-bold text-primary mb-1 text-sm">Finance Department</h3>
-        <p class="text-xs text-sec">Location: Sfax</p>
-    </div>
-    <div class="bg-sec p-4 rounded-lg border myBorder">
-        <h3 class="font-bold text-primary mb-1 text-sm">Marketing Department</h3>
-        <p class="text-xs text-sec">Location: Tunis</p>
-    </div>
-    <div class="bg-sec p-4 rounded-lg border myBorder">
-        <h3 class="font-bold text-primary mb-1 text-sm">Operations Department</h3>
-        <p class="text-xs text-sec">Location: Sousse</p>
+
+    <div #deptScroller class="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x">
+        @for (s of structures(); track s.id) {
+        <div class="shrink-0 w-64 bg-sec p-4 rounded-lg border myBorder snap-start">
+            <h3 class="font-bold text-primary mb-1 text-sm truncate">{{ s.libelle }}</h3>
+            <p class="text-xs text-sec">Lieu : {{ s.lieu || '—' }}</p>
+            @if (s.nombreParticipants != null) {
+            <p class="text-xs text-sec mt-1">{{ s.nombreParticipants }} participants</p>
+            }
+        </div>
+        } @empty {
+        <p class="text-sec text-sm">Aucun département disponible</p>
+        }
     </div>
 </div>
 

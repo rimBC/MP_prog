@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Employeur, FormateurDTO, FormateurService } from '../../../core/services/formateurs.service';
 import { FormateurCard } from './formateur-card/formateur-card';
 import { CommonModule } from '@angular/common';
@@ -44,6 +44,52 @@ export class ManageFormateur implements OnInit {
     });
   });
 
+  // Pagination
+  readonly pageSize = signal(9);
+  readonly pageIndex = signal(0);
+
+  readonly pagedFormateurs = computed<FormateurDTO[]>(() => {
+    const list = this.filteredFormateurs();
+    const size = this.pageSize();
+    const start = this.pageIndex() * size;
+    return list.slice(start, start + size);
+  });
+
+  readonly totalPages = computed<number>(() =>
+    Math.max(1, Math.ceil(this.filteredFormateurs().length / this.pageSize()))
+  );
+
+  readonly pageNumbers = computed<number[]>(() => {
+    const total = this.totalPages();
+    const cur = this.pageIndex();
+    const windowSize = 5;
+    let start = Math.max(0, cur - 2);
+    let end = Math.min(total, start + windowSize);
+    start = Math.max(0, end - windowSize);
+    const out: number[] = [];
+    for (let i = start; i < end; i++) out.push(i);
+    return out;
+  });
+
+  constructor() {
+    // Reset to first page on filter change.
+    effect(() => {
+      this.filterType(); this.searchText();
+      this.pageIndex.set(0);
+    });
+    // Clamp when list shrinks.
+    effect(() => {
+      const total = this.filteredFormateurs().length;
+      const lastPage = Math.max(0, Math.ceil(total / this.pageSize()) - 1);
+      if (this.pageIndex() > lastPage) this.pageIndex.set(lastPage);
+    });
+  }
+
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages()) return;
+    this.pageIndex.set(p);
+  }
+
   ngOnInit(): void {
     this.formateurService.loadFormateurs();
     this.formateurService.loadEmployeurs();
@@ -65,7 +111,6 @@ export class ManageFormateur implements OnInit {
   }
 
   handleSave(event: { data: Partial<FormateurDTO>; editingId: number | null }): void {
-    alert("adding formateur")
     this.error = null;
     this.success = null;
     this.loading = true;

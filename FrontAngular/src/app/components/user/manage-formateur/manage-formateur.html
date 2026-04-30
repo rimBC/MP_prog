@@ -1,9 +1,9 @@
-<div class="max-w-7xl mx-auto p-6 bg-base text-primary">
+<div class="xl:mx-10 xl:mt-6 mx-auto p-6 bg-base text-primary">
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold text-primary mb-2">Formateurs Management</h1>
-            <p class="text-sec">Gerer les Formateurs des formations (Interne et Externe)</p>
+            <h1 class="text-4xl font-bold text-primary mb-2">Gestion des Formateurs</h1>
+            <p class="text-sec">Gérer les formateurs des formations (Interne et Externe)</p>
         </div>
         <div class="flex gap-4 items-center">
             <button (click)="openCreateModal()" class="btn btn-primary font-medium rounded-lg transition text-sm">
@@ -27,53 +27,53 @@
     <!-- Filters Section -->
     <div class="bg-sec rounded-lg shadow-lg p-4 mb-8">
 
-        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 items-center transition-all ease-in-out">
-        
-        
-            <div class="flex justify-between items-center text-sec md:col-span-2 lg:col-span-4">
-                <div class="hidden lg:flex flex-col min-w-40 ">
-                <h2 class="text-xl font-bold text-primary">Filters</h2>
-                <p class="text-sec text-sm">
+        <div class="flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-end lg:justify-between">
+
+            <!-- Header: title + count (hidden below lg) -->
+            <div class="hidden lg:flex flex-col shrink-0">
+                <h2 class="text-xl font-bold text-primary">Filtres</h2>
+                <p class="text-sec text-sm whitespace-nowrap">
                     Affiche {{ filteredFormateurs().length }} de {{ formateurs().length }} Formateurs
                 </p>
             </div>
-                <div class="flex text-sec h-11">
-                <div
-                    class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        class="size-3.5 peer-focus:stroke-blue-700 transition-colors">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                </div>
-                <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
-                    placeholder="Search"
-                    class="px-4 py-2 bg-base border myBorder rounded-r-md outline-none " />
-            </div>
-            </div>
-            <div>
 
+            <!-- Filter controls grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 min-w-0  max-w-3xl">
+
+                <!-- Search -->
+                <div class="flex h-11 w-full min-w-0 sm:col-span-2">
+                    <div class="inline-flex btn-primary text-xs p-1.5 h-full border rounded-l-md items-center justify-center text-white/30 w-12 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                            class="size-3.5 peer-focus:stroke-blue-700 transition-colors">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </div>
+                    <input [ngModel]="searchText()" (ngModelChange)="searchText.set($event)"
+                        placeholder="Rechercher"
+                        class="flex-1 min-w-0 px-4 py-2 bg-base border myBorder rounded-r-md outline-none" />
+                </div>
+
+                <!-- Type -->
                 <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)"
-                    class="w-full px-4 py-2 bg-base border myBorder rounded-lg outline-none h-11">
-                    <option value="ALL">All Types</option>
+                    class="w-full h-11 px-4 py-2 bg-base border myBorder rounded-lg outline-none min-w-0">
+                    <option value="ALL">Tous les types</option>
                     <option value="INTERNE">Interne</option>
                     <option value="EXTERNE">Externe</option>
                 </select>
-            </div>
 
-            <div class="flex items-end h-11">
-                <button (click)="resetFilters()" class="w-full btn-primary py-2 rounded-lg transition">
-                    Reset
+                <!-- Réinitialiser -->
+                <button (click)="resetFilters()" class="w-full h-11 btn-primary px-6 rounded-lg transition">
+                    Réinitialiser
                 </button>
             </div>
-        </div>
 
-        
+        </div>
     </div>
 
     <!-- Trainers Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        @for (formateur of filteredFormateurs(); track formateur.id) {
+        @for (formateur of pagedFormateurs(); track formateur.id) {
         <app-formateur-card
             [formateur]="formateur"
             (deleteClicked)="deleteFormateur($event)"
@@ -81,6 +81,45 @@
         </app-formateur-card>
         }
     </div>
+
+    <!-- État vide -->
+    @if (filteredFormateurs().length === 0) {
+    <div class="bg-sec rounded-lg shadow p-8 text-center text-sec mt-4">
+        <p class="text-lg mb-2">Aucun formateur trouvé</p>
+        <p class="text-sm">Essayez d'ajuster vos filtres ou d'ajouter un nouveau formateur</p>
+    </div>
+    }
+
+    <!-- Pagination footer -->
+    @if (filteredFormateurs().length > pageSize()) {
+    <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-3 sm:px-4 py-3 bg-sec border myBorder rounded-lg">
+        <p class="text-xs sm:text-sm text-sec text-center sm:text-left">
+            Page <span class="font-medium text-primary">{{ pageIndex() + 1 }}</span>
+            / <span class="font-medium text-primary">{{ totalPages() }}</span>
+            — <span class="font-medium text-primary">{{ filteredFormateurs().length }}</span> résultats
+        </p>
+        <nav class="inline-flex -space-x-px self-center sm:self-auto">
+            <button class="px-3 py-1.5 text-sec border myBorder rounded-l-md hover:bg-primary/10 disabled:opacity-50"
+                    [disabled]="pageIndex() === 0"
+                    (click)="goToPage(pageIndex() - 1)">
+                ‹
+            </button>
+            @for (p of pageNumbers(); track p) {
+            <button class="px-3 py-1.5 text-sm border myBorder"
+                    [class.btn-primary]="p === pageIndex()"
+                    [class.text-primary]="p !== pageIndex()"
+                    (click)="goToPage(p)">
+                {{ p + 1 }}
+            </button>
+            }
+            <button class="px-3 py-1.5 text-sec border myBorder rounded-r-md hover:bg-primary/10 disabled:opacity-50"
+                    [disabled]="pageIndex() >= totalPages() - 1"
+                    (click)="goToPage(pageIndex() + 1)">
+                ›
+            </button>
+        </nav>
+    </div>
+    }
 
     <app-formateur-modal
         [isOpen]="modalOpen"
