@@ -839,16 +839,16 @@ curl -X GET http://localhost:8080/api/formateurs/type/interne \
 
 ---
 
-## 🔒 Security Features Implemented
+## Security Features Implemented
 
-**JWT Authentication**: Token-based stateless authentication
-**Password Encryption**: BCrypt for secure password hashing
-**Role-Based Access Control (RBAC)**: Three-tier role system
-**Method-Level Security**: @PreAuthorize annotations
-**CORS Configuration**: Configurable cross-origin requests
-**CSRF Protection**: Built-in Spring Security CSRF tokens
-**Input Validation**: Bean validation and custom validators
-**Exception Handling**: Global exception handler
+-**JWT Authentication**: Token-based stateless authentication
+-**Password Encryption**: BCrypt for secure password hashing
+-**Role-Based Access Control (RBAC)**: Three-tier role system
+-**Method-Level Security**: @PreAuthorize annotations
+-**CORS Configuration**: Configurable cross-origin requests
+-**CSRF Protection**: Built-in Spring Security CSRF tokens
+-**Input Validation**: Bean validation and custom validators
+-**Exception Handling**: Global exception handler
 
 ---
 
@@ -856,61 +856,13 @@ curl -X GET http://localhost:8080/api/formateurs/type/interne \
 
 
 
-## 🛠️ Creating the Default Credentials via Postman
+## Creating the Default Credentials via Postman
 
 If your database does not yet contain the test users (e.g. you skipped `seed.sql` or are running against a fresh schema), you can create them by hitting the public `POST /api/auth/signup` endpoint from Postman.
 
 > The signup endpoint takes a numeric `roleId` that must match a row in the `role` table. After running `schema.sql`, insert the roles first (or run `seed.sql` which populates them):
-> `1 = SIMPLE_UTILISATEUR`, `2 = ADMINISTRATEUR`, `3 = RESPONSABLE`. Adjust the IDs below if your `role` table uses different values.
+> `1 = ADMINISTRATEUR`, `2 = RESPONSABLE`, `3 = SIMPLE_UTILISATEUR`. Adjust the IDs below if your `role` table uses different values.
 
-<<<<<<< HEAD
-### 1. Create the admin user
-
-**Request:**
-```
-POST http://localhost:8080/api/auth/signup
-Content-Type: application/json
-
-{
-  "login": "admin",
-  "password": "admin123",
-  "passwordConfirm": "admin123",
-  "roleId": 2
-}
-```
-
-### 2. Create the basic user
-
-**Request:**
-```
-POST http://localhost:8080/api/auth/signup
-Content-Type: application/json
-
-{
-  "login": "user1",
-  "password": "password123",
-  "passwordConfirm": "password123",
-  "roleId": 1
-}
-```
-
-### 3. Create the manager user
-
-**Request:**
-```
-POST http://localhost:8080/api/auth/signup
-Content-Type: application/json
-
-{
-  "login": "manager1",
-  "password": "password123",
-  "passwordConfirm": "password123",
-  "roleId": 3
-}
-```
-
-=======
->>>>>>> 3ef86eab2ee9c3f315a78ca86d8e8879ccbd038f
 ### Postman setup tips
 
 - Set the request method to **POST** and the URL to `http://localhost:8080/api/auth/signup`.
@@ -922,7 +874,7 @@ Content-Type: application/json
 
 ---
 
-## 🔑 Default Test Credentials
+## Default Test Credentials
 
 | User | Password | Role | Purpose |
 |------|----------|------|---------|
@@ -932,7 +884,7 @@ Content-Type: application/json
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Issue: "Connection refused" for PostgreSQL
 
