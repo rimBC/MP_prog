@@ -14,7 +14,7 @@ ModalComponent
 export class ContactForm implements OnInit{
 
 contactForm: any;
-myEmail:string= 'benchaalia.rim@etudiant-fst.utm.tn';
+myEmail:string= '1ING02@etudiant-isi.utm.tn';
 title: 'success'|'failed'='failed';
 isModalVisible:boolean=false;
 response :string=`No data wass sent`;
